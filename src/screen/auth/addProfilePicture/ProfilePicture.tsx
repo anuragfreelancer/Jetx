@@ -14,9 +14,22 @@ import CustomHeader from '../../../compoent/CustomHeader';
 import StatusBarComponent from '../../../compoent/StatusBarCompoent';
 import CustomButton from '../../../compoent/CustomButton';
 import imageIndex from '../../../assets/imageIndex';
+import useAddProfilePicture from './useAddProfilePicture';
+import ImagePickerModal from '../../../compoent/ImagePickerModal';
 
 export default function AddProfilePicture() {
-  const navigation = useNavigation<any>()
+  const {
+    imagePrfile,
+    isLoading,
+    navigation,
+    takePhotoFromCamera,
+    pickImageFromGallery,
+    handleSubmit ,
+    isModalVisible,
+    setIsModalVisible
+  
+  } = useAddProfilePicture()
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -51,10 +64,10 @@ export default function AddProfilePicture() {
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
           <Image
-            source={imageIndex.Ellipse}
-            style={{ height: 170, width: 170 }}
-            resizeMode='contain'
-          />
+                                          source={imagePrfile ? { uri: imagePrfile?.path } : imageIndex.Ellipse}
+
+             style={{ height: 170, width: 170,borderRadius:170 }}
+           />
         </View>
       </ScrollView>
       <View style={{
@@ -64,6 +77,7 @@ export default function AddProfilePicture() {
       }}>
         <CustomButton
           title={'Add picture'}
+          // onPress={() =>  setIsModalVisible(true)}
           onPress={() => navigation.navigate(ScreenNameEnum.AddLocation)}
           buttonStyle={{ width: "100%", marginTop: 28 }}
         />
@@ -80,6 +94,12 @@ export default function AddProfilePicture() {
           marginBottom: 15
         }}>Skip</Text>
       </TouchableOpacity>
+      <ImagePickerModal
+        modalVisible={isModalVisible}
+        setModalVisible={setIsModalVisible}
+        pickImageFromGallery={pickImageFromGallery}
+        takePhotoFromCamera={takePhotoFromCamera}
+      />
     </SafeAreaView>
   );
 }

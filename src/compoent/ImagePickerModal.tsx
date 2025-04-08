@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     width: '100%',
-    backgroundColor: '#A0D803',
+    backgroundColor: '#FF3B30',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',

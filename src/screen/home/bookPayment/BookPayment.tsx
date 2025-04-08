@@ -133,39 +133,44 @@ const BookPayment = () => {
         ) : null}
 
         {/* Valid Thru and CVV */}
-        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 18, marginBottom: 5 }}>
+        <View style={{  flexDirection: "row", alignItems: "center", marginTop: 18, marginBottom: 5 }}>
           <Text style={styles.sectionTitle}>Valid Thru</Text>
           <Text style={[styles.sectionTitle, { left: 100 }]}>CVV</Text>
         </View>
         <View style={styles.rowBetween}>
           <View style={{
+            height:55,
+            padding:12,
              alignItems: "center", justifyContent: "center", backgroundColor: "#F8F8F8", flexDirection: "row", borderRadius: 10, marginBottom: 10, marginTop: 15
           }}>
             <TextInput
               editable={false}
               placeholder="Month"
               value={validThruMonth}
+            
               onChangeText={setValidThruMonth}
             />
-            <Image source={imageIndex.arrowDown} style={{ height: 17, width: 17, right: 3 }} resizeMode="contain" />
+            <Image source={imageIndex.arrowDown} style={{ height: 17, width: 17, marginLeft: 5 }} resizeMode="contain" />
           </View>
-          <View style={{ marginLeft: 12, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F8F8", flexDirection: "row", borderRadius: 10, marginBottom: 10, marginTop: 15 }}>
+          <View style={{   height:55,
+            padding:12,marginLeft: 12, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F8F8", flexDirection: "row", borderRadius: 10, marginBottom: 10, marginTop: 15 }}>
             <TextInput
               editable={false}
               placeholder="Year"
               value={validThruYear}
               onChangeText={setValidThruYear}
             />
-            <Image source={imageIndex.arrowDown} style={{ height: 17, width: 17, right: 3 }} resizeMode="contain" />
+            <Image source={imageIndex.arrowDown} style={{ height: 17, width: 17, marginLeft: 5 }} resizeMode="contain" />
           </View>
-          <View style={{ marginLeft: 12, alignItems: "center", justifyContent: "center", backgroundColor: "#F8F8F8", flexDirection: "row", borderRadius: 10, marginBottom: 10, marginTop: 15 }}>
+          <View style={{ marginLeft: 12, height:55,
+            padding:12,alignItems: "center", justifyContent: "center", backgroundColor: "#F8F8F8", flexDirection: "row", borderRadius: 10, marginBottom: 10, marginTop: 15 }}>
             <TextInput
               editable={false}
               placeholder="CVV"
               value={cvv}
               onChangeText={setCvv}
             />
-            <Image source={imageIndex.eye} style={{ height: 17, width: 17, right: 3 }} resizeMode="contain" />
+            <Image source={imageIndex.eye} style={{ height: 17, width: 17, marginLeft: 5 }} resizeMode="contain" />
           </View>
         </View>
         {validationMessages.validThru ? (

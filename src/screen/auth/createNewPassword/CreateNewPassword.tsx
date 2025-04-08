@@ -18,7 +18,6 @@ import CustomButton from '../../../compoent/CustomButton';
 import useCreateNewPassword from './useCreateNewPassword';
 import LoadingModal from '../../../utils/Loader';
 import ScreenNameEnum from '../../../routes/screenName.enum';
-import { styles } from '../loginStyle';
 
 export default function CreateNewPassword() {
   const { credentials,

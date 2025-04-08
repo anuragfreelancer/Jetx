@@ -170,9 +170,19 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginTop: 12,
-    elevation:2,
-    marginVertical:2,
-    marginHorizontal:1
+    elevation: 2, // Android
+    marginVertical: 2,
+    marginHorizontal: 1,
+    
+    // iOS Shadow
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    
    },
   route: {
     fontSize: 16,

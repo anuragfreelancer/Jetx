@@ -8,21 +8,13 @@ import CustomHeader from '../../../compoent/CustomHeader';
 const flightData = [
   {
     id: '1',
-    name: 'Gulfstream G650',
+    name: 'Cessna Citation X+',
     image: imageIndex.fliteBag,
     speed: '647 mph',
     range: '7,500 miles',
     price: '$96,000/hr',
   },
-  {
-    id: '2',
-    name: 'Bombardier Global 7500',
-    image: imageIndex.fliteBag,
-    speed: '610 mph',
-    range: '7,700 miles',
-    price: '$96,000/hr',
-  },
-  // Add more items...
+  
 ];
 
 

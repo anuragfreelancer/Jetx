@@ -21,13 +21,21 @@ const styles = StyleSheet.create({
       marginTop: 13
   },
   paymentOption: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#FFF',
-      padding: 15,
-      marginVertical: 10,
-      borderRadius: 20,
-      elevation: 1, // Android shadow
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    padding: 15,
+    marginVertical: 10,
+    borderRadius: 20,
+  
+    // Android shadow
+    elevation: 1,
+  
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
 
   },
   icon: {

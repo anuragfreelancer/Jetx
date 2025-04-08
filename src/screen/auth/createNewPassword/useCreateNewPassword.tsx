@@ -13,7 +13,7 @@ const useCreateNewPassword = () => {
   const { userId } = route.params || ''; // Provide a fallback if route.params is undefined
   const [errors, setErrors] = useState<any>({});
   const [isLoading, setisLoading] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const handleChange = (field:string, value:string) => {
     setCredentials((prev:any) => ({ ...prev, [field]: value }));
     setErrors((prev:any) => ({ ...prev, [field]: '' }));

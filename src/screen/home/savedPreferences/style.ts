@@ -10,17 +10,25 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 2,
+    marginVertical:2,
+    marginHorizontal:2,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    marginVertical: 1,
-    marginHorizontal: 1,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+
+    // Android Shadow
+    elevation: 2,
+
+    
   },
   image: {
     width: 80,
     height: 80,
-    borderRadius: 12,
+    borderRadius: 80,
   },
   info: {
     flex: 1,

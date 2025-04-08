@@ -22,6 +22,7 @@
     "react-native-confirmation-code-field": "^7.4.0",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-haptic-feedback": "^2.3.3",
+    "react-native-image-crop-picker": "^0.42.0",
     "react-native-reanimated": "^3.17.2",
     "react-native-render-html": "^6.3.4",
     "react-native-responsive-screen": "^1.4.2",

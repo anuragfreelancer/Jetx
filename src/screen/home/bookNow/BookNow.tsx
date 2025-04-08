@@ -23,7 +23,7 @@ const BookNow = () => {
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <TouchableOpacity style={styles.card}
-            onPress={() => navigation.navigate(ScreenNameEnum.JetDetails)}
+            // onPress={() => navigation.navigate(ScreenNameEnum.JetDetails)}
           >
             <ImageBackground source={imageIndex.fliteBag} style={styles.image} >
             </ImageBackground>

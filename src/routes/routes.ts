@@ -7,7 +7,7 @@ import Splash from "../screen/auth/splash/Splash";
  import { useSelector } from "react-redux";
  import ScreenNameEnum from "./screenName.enum";
 import OnboardingScreen from "../screen/auth/onboarding/Onboarding";
-import AddProfilePicture from "../screen/auth/addProfilePicture/AddProfilePicture";
+import AddProfilePicture from "../screen/auth/addProfilePicture/ProfilePicture";
 import AddLocation from "../screen/auth/addLocation/AddLocation";
 import ChangeLocation from "../screen/auth/changeLocation/ChangeLocation";
 import HomeScreen from "../screen/home/homeScreen/HomeScreen";
