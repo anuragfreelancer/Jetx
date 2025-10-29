@@ -10,9 +10,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
   const isFocus = useIsFocused();
   const checkLogout = () => {
     if (isLogin?.isLogin) {
-      navigation.navigate(ScreenNameEnum.OnboardingScreen);
+      navigation.navigate(ScreenNameEnum.HomeScreen);
     } else {
-       navigation.navigate(ScreenNameEnum.OnboardingScreen);
+       navigation.navigate(ScreenNameEnum.LoginScreen);
      }
   };
 

@@ -1,189 +1,283 @@
 import {
-    View,
-    Text,
-    Image,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    SafeAreaView,
-} from 'react-native';
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+ } from 'react-native';
 import React from 'react';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import TextInputField from '../../../utils/TextInputField';
 import StatusBarCompoent from '../../../compoent/StatusBarCompoent';
 import imageIndex from '../../../assets/imageIndex';
 import ResponsiveSize from '../../../utils/ResponsiveSize';
-import { wp } from '../../../utils/Constant';
-import CustomButton from '../../../compoent/CustomButton';
+ import CustomButton from '../../../compoent/CustomButton';
 import ScreenNameEnum from '../../../routes/screenName.enum';
-import useSignup from './useSinup';
-import LoadingModal from '../../../utils/Loader';
+ import LoadingModal from '../../../utils/Loader';
 import CountryCodeModal from '../../../compoent/CountryCodeModal';
-import DropdownModal from '../../../compoent/DropdownModal';
+ import useSignup from './useSinup';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SignUp() {
-    const {
-        credentials,
-        errors,
-        isLoading,
-        handleChange,
-        handleSignup,
-        navigation,
-        selectedOption, setSelectedOption,
-        dropOpen, setDropOpen,
-        selectedCountryCode, setSelectedCountryCode,
-        countyModal, setCountyModal,
-        handleCountryCodeSelect
-    } = useSignup()
-    const injuryOptions = [
-        { id: '1', label: 'No Injury' },
-        { id: '2', label: 'Select Previous Injuries' },
-        { id: '3', label: 'Beginner' }
-      ];
-    
-    return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-            <StatusBarCompoent />
-            {isLoading ? <LoadingModal /> : null}
-            <ScrollView showsVerticalScrollIndicator={false} >
-                <View
-                    style={{
-                        backgroundColor: '#FFF',
-                        padding: 15,
-                        flex: 1,
-                        marginTop: hp(5)
-                    }}>
-                    <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+  const {
+    credentials,
+    errors,
+    isLoading,
+    handleChange,
+    handleSignup,
+    navigation,
+    selectedOption,
+    setSelectedOption,
+    dropOpen,
+    setDropOpen,
+    selectedCountryCode,
+    setSelectedCountryCode,
+    countyModal,
+    setCountyModal,
+    handleCountryCodeSelect,
+  } = useSignup();
 
-                        <Image
-                            source={imageIndex.appLogo}
-                            style={{ height: 57, width: 176 }} resizeMode='contain'
-                        />
-                    </View>
-                    <View style={{ marginTop: 22, alignItems: "center" }}>
-                        <Text style={{
-                            color: "black",
-                            fontSize: 24,
-                            fontWeight: "900"
-                        }}>Create Your Account.</Text>
+ 
 
-                    </View>
-                    <View style={{ marginTop: ResponsiveSize.marginTop(25), paddingVertical: hp(2), }}>
-
-
-                        <TextInputField
-                            //  onChangeText={(value: string) => handleChange('email', value)} // Handles email input dynamically
-                            placeholder={'Full Name '}
-                            // text={credentials.email}
-                            firstLogo={true}
-                            img={imageIndex.Fideuser}
-                        />
-                        <TextInputField
-                            //  onChangeText={(value: string) => handleChange('email', value)} // Handles email input dynamically
-                            placeholder={'Email '}
-                            // text={credentials.email}
-                            firstLogo={true}
-                            img={imageIndex.emai}
-                        />
-                        {errors.email ? <Text style={{ color: 'red', fontSize: 12, marginTop: 10 }}>{errors.email}</Text> : null}
-                        <TextInputField
-                            onChangeText={(value: string) => handleChange('mobile', value)} // Handles email input dynamically
-                            text={credentials.mobile}
-                            placeholder={'Phone'}
-                            firstLogo={true}
-                            showEye={false}
-                            img={imageIndex.phone}
-                            type="decimal-pad"
-                        />
-                        {errors.mobile ? <Text style={{ color: 'red', fontSize: 12, marginTop: 10 }}>{errors.mobile}</Text> : null}
-                        <TextInputField
-                            lable={"Password"}
-                            placeholder="Password"
-                            firstLogo={true}
-                            showEye={true}
-                            img={imageIndex.lock}
-                        />
-                        {errors.password ? <Text style={{ color: 'red', fontSize: 12, marginTop: 10 }}>{errors.password}</Text> : null}
-
-                        <TextInputField
-                            placeholder="City"
-                            firstLogo={true}
-                            showEye={false}
-                            img={imageIndex.city}
-                        />
-                        <TextInputField
-                            placeholder="Country"
-                            firstLogo={true}
-                            showEye={false}
-                            img={imageIndex.country}
-                        />
-                        <TextInputField
-                            placeholder="Password"
-                            firstLogo={true}
-                            showEye={false}
-                            img={imageIndex.lock}
-                        />
-                    </View>
-                    <CustomButton
-                        title={'Sign up'}
-                        onPress={() => navigation.navigate(ScreenNameEnum.LoginScreen)}
-                        // onPress={() => handleSignup()}
-                        buttonStyle={{ width: "100%", marginTop: 28 }}
-                    />
-                </View>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginTop: 40,
-                        alignSelf: 'center',
-                        justifyContent: 'flex-end', // Change this to flex-end 
-                        marginBottom: 20
-                    }}>
-                    <Text style={{ fontSize: 16, fontWeight: "600", lineHeight: 22, color: '#909090' }}>
-                        Alrady have an account?{' '}
-                    </Text>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate(ScreenNameEnum.LoginScreen)}
-
-                    >
-                        <Text style={Styles.text}>Login</Text>
-                    </TouchableOpacity>
-                </View>
-
-            </ScrollView>
-            <CountryCodeModal
-                visible={countyModal}
-                onSelect={handleCountryCodeSelect}
-                onClose={() => setCountyModal(false)}
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBarCompoent />
+      {isLoading && <LoadingModal />}
+      
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.content}>
+          {/* Header Section */}
+          <View style={styles.header}>
+            <Image
+              source={imageIndex.appLogo}
+              style={styles.logo}
+              resizeMode="contain"
             />
-            <DropdownModal
-                visible={false}
-                options={injuryOptions}
+          </View>
+
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Create Your Account</Text>
+          </View>
+
+          {/* Form Section */}
+          <View style={styles.formContainer}>
+            {/* Full Name */}
+            <TextInputField
+              onChangeText={(value: string) => handleChange('fullName', value)}
+              placeholder="Full Name"
+              value={credentials.fullName}
+              firstLogo={true}
+              img={imageIndex.Fideuser}
             />
-        </SafeAreaView>
-    );
+            {errors.fullName && (
+              <Text style={styles.errorText}>{errors.fullName}</Text>
+            )}
+
+            {/* Email */}
+            <TextInputField
+              onChangeText={(value: string) => handleChange('email', value)}
+              placeholder="Email"
+              value={credentials.email}
+              firstLogo={true}
+              img={imageIndex.emai}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
+
+            {/* Phone with Country Code */}
+            <View style={styles.phoneContainer}>
+              <TouchableOpacity 
+                style={styles.countryCodeButton}
+                onPress={() => setCountyModal(true)}
+              >
+                <Text style={styles.countryCodeText}>{selectedCountryCode}</Text>
+              </TouchableOpacity>
+              <View style={styles.phoneInput}>
+                <TextInputField
+                  onChangeText={(value: string) => handleChange('mobile', value)}
+                  value={credentials.mobile}
+                  placeholder="Phone Number"
+                  firstLogo={false}
+                  showEye={false}
+                  type="phone-pad"
+                />
+              </View>
+            </View>
+            {errors.mobile && (
+              <Text style={styles.errorText}>{errors.mobile}</Text>
+            )}
+
+            {/* Password */}
+            <TextInputField
+              onChangeText={(value: string) => handleChange('password', value)}
+              placeholder="Password"
+              value={credentials.password}
+              firstLogo={true}
+              showEye={true}
+              img={imageIndex.lock}
+              secureTextEntry
+            />
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
+
+            {/* City */}
+            <TextInputField
+              onChangeText={(value: string) => handleChange('city', value)}
+              placeholder="City"
+              value={credentials.city}
+              firstLogo={true}
+              showEye={false}
+              img={imageIndex.city}
+            />
+
+          
+ 
+          
+          </View>
+
+          {/* Sign Up Button */}
+          <CustomButton
+            title="Sign up"
+            onPress={handleSignup}
+            buttonStyle={styles.signupButton}
+            disabled={isLoading}
+          />
+
+          {/* Login Redirect */}
+          <View style={styles.loginRedirect}>
+            <Text style={styles.redirectText}>
+              Already have an account?{' '}
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate(ScreenNameEnum.LoginScreen)}
+            >
+              <Text style={styles.loginText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Modals */}
+      <CountryCodeModal
+        visible={countyModal}
+        onSelect={handleCountryCodeSelect}
+        onClose={() => setCountyModal(false)}
+      />
+{/*       
+      <DropdownModal
+        visible={dropOpen}
+        options={injuryOptions}
+        onSelect={handleOptionSelect}
+        onClose={() => setDropOpen(false)}
+        selectedValue={selectedOption}
+      /> */}
+    </SafeAreaView>
+  );
 }
 
-const Styles = StyleSheet.create({
-    text: {
-        fontSize: 16,
-        lineHeight: 24,
-        fontWeight: '700',
-        color: 'black',
-        bottom: 2
-    },
-    btn: {
-        alignSelf: 'center',
-        backgroundColor: '#E8442E',
-        height: 55,
-
-        borderRadius: 30,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 30,
-        width: wp(90),
-    },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
+    backgroundColor: '#FFF',
+    padding: 15,
+    flex: 1,
+    marginTop: hp(5),
+  },
+  header: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  logo: {
+    height: 57,
+    width: 176,
+  },
+  titleContainer: {
+    marginTop: 22,
+    alignItems: 'center',
+  },
+  title: {
+    color: 'black',
+    fontSize: 24,
+    fontWeight: '900',
+  },
+  formContainer: {
+    marginTop: ResponsiveSize.marginTop(25),
+    paddingVertical: hp(2),
+  },
+  phoneContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  countryCodeButton: {
+    padding: 15,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  countryCodeText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'black',
+  },
+  phoneInput: {
+    flex: 1,
+  },
+  dropdownTrigger: {
+    padding: 15,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginTop: 10,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: 'black',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 5,
+  },
+  signupButton: {
+    width: '100%',
+   },
+  loginRedirect: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 40,
+    alignSelf: 'center',
+    justifyContent: 'flex-end',
+    marginBottom: 20,
+  },
+  redirectText: {
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 22,
+    color: '#909090',
+  },
+  loginText: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '700',
+    color: 'black',
+  },
 });
-
-

@@ -1,7 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
- 
+import { createSlice } from '@reduxjs/toolkit';
 
-// Initial state
 const initialState = {
   isLoading: false,
   isError: false,
@@ -10,17 +8,17 @@ const initialState = {
   isLogOut: false,
   userData: null,
   token: null,
-  forgotData: null,
-  betOption: null,
-  gameResult: null,
-  newbetOption: null,
 };
- 
-// Slice
+
 const AuthSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    setLoading(state) {
+      state.isLoading = true;
+      state.isError = false;
+      state.isSuccess = false;
+    },
     loginSuccess(state, action) {
       state.isLoading = false;
       state.isSuccess = true;
@@ -39,8 +37,11 @@ const AuthSlice = createSlice({
       state.userData = null;
       state.token = null;
     },
+    resetAuth(state) {
+      return initialState;
+    },
   },
 });
 
-export const { loginSuccess, logout } = AuthSlice.actions;
+export const { setLoading, loginSuccess, logout, resetAuth } = AuthSlice.actions;
 export default AuthSlice.reducer;

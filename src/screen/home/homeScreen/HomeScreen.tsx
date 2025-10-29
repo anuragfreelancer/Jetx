@@ -511,7 +511,7 @@
 
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { 
   View, 
   Text, 
@@ -537,16 +537,34 @@ import ScreenNameEnum from '../../../routes/screenName.enum';
 import styles from './style';
 import { FlightService } from '../../../flightService';
 import LoadingModal from '../../../utils/Loader';
+import { useDispatch, useSelector } from 'react-redux';
+import { GetProfile } from '../../../redux/Api/AuthApi';
 
 const HomeScreen = () => {
   const { height, width } = Dimensions.get('window');
   const navigation = useNavigation();
+       const dispatch = useDispatch();
+    const isLogin = useSelector((state: any) => state.auth);
+    const userGet = useSelector((state: any) => state.feature);
+    const userId = isLogin?.userData?.id; 
+    const userData = userGet?.userGetData
+useEffect(()=>{
+  handleGetProfile()
+},[])
+    const handleGetProfile = useCallback(async () => {
+        if (userId) {
+            await GetProfile(userId, dispatch);
+        } else {
+            console.log("User ID not available");
+        }
+    }, [userId, dispatch]);
+ 
 
   // State for search parameters
   const [searchParams, setSearchParams] = useState({
     origin: 'DEL',
     destination: 'JFK',
-    departureDate: '2025-10-28',
+    departureDate: '2025-10-29',
     returnDate: '',
     adults: 1
   });
@@ -597,7 +615,7 @@ const HomeScreen = () => {
   };
 
   // Handle date change
-  const onDateChange = (event, selectedDate) => {
+  const onDateChange = (event:any, selectedDate:any) => {
     // Hide the picker
     setShowDeparturePicker(false);
     setShowReturnPicker(false);
@@ -607,7 +625,7 @@ const HomeScreen = () => {
       
       if (selectedDateType === 'departure') {
         // If setting departure date and return date exists, validate
-        if (searchParams.returnDate && !validateDates(formattedDate, searchParams.returnDate)) {
+        if (searchParams?.returnDate && !validateDates(formattedDate, searchParams?.returnDate)) {
           return; // Don't update if validation fails
         }
         
@@ -761,7 +779,7 @@ const HomeScreen = () => {
 
   // Render flight item for private jets section
   const renderJetItem = ({ item }) => {
-    console.log("isssssstem",item)
+    // console.log("isssssstem",item)
     return(
          <TouchableOpacity 
       style={styles.card}
@@ -771,19 +789,7 @@ const HomeScreen = () => {
 uri:"https://img.freepik.com/free-photo/airplane-aircraft-travel-trip_53876-30273.jpg"
 
       }} style={styles.cardImage} imageStyle={styles.cardImageStyle}>
-        {/* <View style={styles.cardHeader}>
-          <View style={styles.premiumBadge}>
-            <Text style={styles.premiumText}>PREMIUM</Text>
-          </View>\
-          <TouchableOpacity style={styles.saveButton}>
-            <Image 
-              source={imageIndex.archive}
-              style={styles.saveIcon}
-              resizeMode='contain'
-            />
-          </TouchableOpacity>
-        </View> */}
-      </ImageBackground>
+       </ImageBackground>
 
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.name}</Text>
@@ -848,7 +854,7 @@ uri:"https://img.freepik.com/free-photo/airplane-aircraft-travel-trip_53876-3027
         
         <View style={styles.routeMiddle}>
           <Text style={styles.durationText}>
-            {item.itineraries[0].duration.replace('PT', '').toLowerCase()}
+            {item?.itineraries[0].duration?.replace('PT', '').toLowerCase()}
           </Text>
           <View style={styles.flightLineContainer}>
             <View style={styles.flightDot} />
@@ -882,15 +888,15 @@ uri:"https://img.freepik.com/free-photo/airplane-aircraft-travel-trip_53876-3027
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBarComponent backgroundColor='#FF3B30' barStyle="light-content" />
             {loading ? <LoadingModal /> : null}
 
       {/* Header */}
-      <View style={[styles.header, { height: height * 0.22 }]}>
+      <View style={[styles.header, { height: height * 0.20 }]}>
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.greetingText}>Hello, Welcome! 👋</Text>
+            <Text style={styles.greetingText}>{userData?.user_name}, Welcome! 👋</Text>
             <Text style={styles.headerText}>
               Find Your Perfect{"\n"}Flight
             </Text>
@@ -911,11 +917,20 @@ uri:"https://img.freepik.com/free-photo/airplane-aircraft-travel-trip_53876-3027
               style={styles.iconButton}
               onPress={() => navigation.navigate(ScreenNameEnum.ProfileScreen)}
             >
-              <Image
+              {userData?.image ?  (  <Image
+                source={{
+                  uri: userData?.image
+                }}
+                style={styles.profileIcon}
+                resizeMode='contain'
+              />):(
+  <Image
                 source={imageIndex.Ellipse}
                 style={styles.profileIcon}
                 resizeMode='contain'
               />
+              )}
+            
             </TouchableOpacity>
           </View>
         </View>
@@ -1112,8 +1127,12 @@ uri:"https://img.freepik.com/free-photo/airplane-aircraft-travel-trip_53876-3027
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 export default HomeScreen;
+
+
+
+

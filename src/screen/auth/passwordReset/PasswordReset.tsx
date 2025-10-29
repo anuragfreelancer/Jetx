@@ -47,7 +47,7 @@ export default function PasswordReset() {
               lineHeight: 36,
               color: 'rgba(0, 0, 0, 1)',
             }}>Password Reset</Text>
-            <Text style={{
+            {/* <Text style={{
                fontWeight: '400',
                fontSize: 16,
                 color: '#9DB2BF',
@@ -55,13 +55,13 @@ export default function PasswordReset() {
                 lineHeight:20
             }}>
               Please put your mobile number to reset your password
-            </Text>
+            </Text> */}
           </View>
           <View
             // onPress={() => setType("SMS")}
 
             style={{
-              flexDirection: 'row', alignItems: "center", justifyContent: "center", marginTop: 25,
+              flexDirection: 'row', alignItems: "center", justifyContent: "center", marginTop: 15,
 
             }}>
             <View
@@ -88,14 +88,15 @@ export default function PasswordReset() {
                   marginLeft: 10
                 }}>Email</Text>
                 <TextInput
-                  placeholder={'joh*******@gmail.com'}
+                  placeholder={'Enter Email'}
                   value={credentials.email}
                   onChangeText={(value: string) => handleChange('email', value)} placeholderTextColor={"#9E9E9E"}
                   style={{
                     fontSize: 14,
                     fontWeight: '600',
                     color: 'black',
-                    marginLeft: 10
+                    marginLeft: 10 ,
+                    marginTop:5
 
                    }}
                 />
@@ -103,6 +104,12 @@ export default function PasswordReset() {
             </View>
 
           </View>
+                        <Text style={{
+                          color:"red" ,
+                          marginTop:11,
+                          marginLeft:5
+                        }}>{errors.email}</Text>
+
         </View>
       </ScrollView>
       <View style={{
@@ -112,10 +119,10 @@ export default function PasswordReset() {
       }}>
         <CustomButton
           title={'Submit'}
-          // onPress={() => handleForgot()
+          onPress={() => handleForgot()
 
-          // }
-           onPress={()=>navigation.navigate(ScreenNameEnum.OtpScreen)}
+          }
+          //  onPress={()=>navigation.navigate(ScreenNameEnum.OtpScreen)}
           buttonStyle={{ width: "100%", marginTop: 28 }}
         />
       </View>

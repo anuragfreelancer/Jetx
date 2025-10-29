@@ -7,7 +7,7 @@ import { ForgotPassUserApi } from '../../../redux/Api/AuthApi';
   // test11@gmail.com
    const navigation = useNavigation();
    const [isLoading, setisLoading] = useState(false)
-  const [credentials, setCredentials] = useState({ email: '',mob:"" });
+  const [credentials, setCredentials] = useState({ email: '', });
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const handleChange = (field:string, value:string) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
@@ -19,18 +19,12 @@ import { ForgotPassUserApi } from '../../../redux/Api/AuthApi';
         setErrors((prev:any) => ({ ...prev, email: 'Enter a valid email address.' }));
       }
     }
-    // if (field === 'mob') {
-    //   if (!value.trim()) {
-    //     setErrors(prev => ({ ...prev, mob: 'Email is required.' }));
-    //   } 
-    // }
+ 
   };
   const handleForgot =async () => {
     const { email } = credentials;
     let validationErrors:any = {}; 
-      //  if (!mob.trim()) {
-      //   validationErrors.mob = 'Mobile No. is required.';
-      // }
+ 
     if (!email.trim()) {
       validationErrors.email = 'Email is required.';
     } else if (!emailRegex.test(email)) {

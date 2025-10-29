@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {  useState } from 'react';
 import { View, Text,  Image, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import imageIndex from '../../../../assets/imageIndex';
 import CustomHeader from '../../../../compoent/CustomHeader';
@@ -8,9 +8,29 @@ import StatusBarComponent from '../../../../compoent/StatusBarCompoent';
 import LogoutModal from '../../../../compoent/LogoutModal';
 import styles from './style';
 import MenuItems from './customData';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../../../redux/feature/authSlice';
+import ScreenNameEnum from '../../../../routes/screenName.enum';
+ 
 const ProfileScreen = () => {
   const navigation = useNavigation()
+const dispatch = useDispatch()
+     const userGet = useSelector((state: any) => state.feature);
+     const userData = userGet?.userGetData
+    const handleLogout = () => async () => {
+  try {
+    setLogoutModal(false)
+    dispatch(logout()); 
+ navigation.reset({
+          index: 0,
+          routes: [{ name: ScreenNameEnum.LoginScreen }],
+        });
+   } catch (error) {
+    console.log('Error clearing user data:', error);
+  }
+};
+// get-profile
+//  
   const renderItem = ({ item }:any) => (
     <TouchableOpacity style={styles.menuItem}
       onPress={() => {
@@ -35,12 +55,18 @@ const ProfileScreen = () => {
           alignItems: 'center',
 
         }}>
-          <Image
+          {userData?.image ? (  <Image
+            source={{ uri: userData?.image }}
+            style={styles.avatar}
+          />):(
+              <Image
             source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }}
             style={styles.avatar}
           />
-          <Text style={styles.name}>Dulce Lubin</Text>
-          <Text style={styles.editText}>View my profile. </Text>
+          )}
+          
+          <Text style={styles.name}>{userData?.user_name}</Text>
+          <Text style={styles.editText}>{userData?.email}</Text>
         </View>
         <FlatList
           data={MenuItems}
@@ -56,7 +82,8 @@ const ProfileScreen = () => {
       </ScrollView>
       <LogoutModal isVisible={logoutModal}
         close={() => setLogoutModal(false)}
-        onSumbit={() => setLogoutModal(false)}
+        onSumbit={
+          handleLogout()}
       />
     </SafeAreaView>
   );

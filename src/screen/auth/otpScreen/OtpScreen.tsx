@@ -9,18 +9,15 @@ import CustomButton from '../../../compoent/CustomButton';
 import StatusBarComponent from '../../../compoent/StatusBarCompoent';
 import CustomHeader from '../../../compoent/CustomHeader';
 import useOtp from './useOtp';
-import ScreenNameEnum from '../../../routes/screenName.enum';
-
+ 
 export default function OtpScreen() {
   const { props, getCellOnLayoutHandler,
     isLoading,
     errorMessage,
     ref,
-    handleChangeText, navigation,
+    handleChangeText,  
     value,
-    ResendOtp,
-    timer,
-    handleVerifyOTP, email } = useOtp()
+     handleVerifyOTP, email } = useOtp()
 
   return (
     <View style={{
@@ -39,6 +36,13 @@ export default function OtpScreen() {
 
           <View style={{ marginTop: 30 }}>
             <Text style={styles.txtHeading}>Check your mail</Text>
+            <Text style={{
+                  fontWeight: '500',
+    fontSize: 20,
+    lineHeight: 36,
+    color: 'rgba(0, 0, 0, 1)'
+            }}>
+              {email}</Text>
             <Text style={styles.txtsubHeading}>
               Please put the 4 digits sent to you
             </Text>
@@ -64,9 +68,9 @@ export default function OtpScreen() {
                 </View>
               )}
             />
-            {/* {errorMessage ? (
+            {errorMessage ? (
               <Text style={{ color: 'red', marginTop: 18 }}>{errorMessage}</Text>
-            ) : null} */}
+            ) : null}
           </View>
           <View style={{ marginTop:12, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -87,8 +91,9 @@ export default function OtpScreen() {
         }}>
           <CustomButton
             title={'Submit'}
-            onPress={() => navigation.navigate(ScreenNameEnum.CreatePassword)}
-          // onPress={handleVerifyOTP}
+            // onPress={() => navigation.navigate(ScreenNameEnum.CreatePassword)}
+            // onPress={() => navigation.navigate(ScreenNameEnum.CreatePassword)}
+    onPress={handleVerifyOTP}
 
           />
         </View>

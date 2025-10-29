@@ -5,11 +5,12 @@ export const constant = {
   ForgetPassword:"forget_password",
   OtpVerify:"otpVerify",
   UpdatePassword:"UpdatePassword",
+  updateProfile:"update-profile",
+
   changePassword:"change-password",
   getrofile:"get-profile",
   getPrivacy:"get-privacy-policy",
   getAboutUs:"get-about-us",
-  updateProfile:"update-profile",
   GettTeam:"get_team", 
   getPosition:"get_position",
   getLoadType:"get_load_type",
@@ -29,6 +30,6 @@ export const constant = {
   Getfaq:"get_faq",
   AddContact_us:"add_contact_us"
 };
-export const base_url = 'https://server-php-8-3.technorizen.com/Football/api/';
-export const image_url = 'https://server-php-8-3.technorizen.com/Football/api/';
+export const base_url = 'https://server-php-8-3.technorizen.com/FlightBooking/api/';
+export const image_url = 'https://server-php-8-3.technorizen.com/FlightBooking/api/';
 

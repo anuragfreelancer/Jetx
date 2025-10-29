@@ -3,13 +3,10 @@ import ScreenNameEnum from "../../routes/screenName.enum";
 import { errorToast, successToast } from "../../utils/customToast";
 import { loginSuccess } from "../feature/authSlice";
 import { getSuccess } from "../feature/authGetSlice";
-
-
-
 const LoginUserApi = async (
     param,
     setLoading,
-    dispatch) => {
+     ) => {
     try {
         setLoading(true)
         const myHeaders = new Headers();
@@ -17,8 +14,7 @@ const LoginUserApi = async (
         const formdata = new FormData();
         formdata.append("email", param?.email);
         formdata.append("password", param?.password);
-        formdata.append("device_id", param?.token);
-        formdata.append("type", param?.logintype);
+        
         const requestOptions = {
             method: "POST",
             headers: myHeaders,
@@ -33,10 +29,10 @@ const LoginUserApi = async (
                     successToast(
                         response?.message
                     );
-                    dispatch(loginSuccess({ userData: response?.result, token: response?.result?.access_token, }));
+                    param.dispatch(loginSuccess({ userData: response?.result, token: response?.result?.access_token, }));
                     param.navigation.reset({
                         index: 0,
-                        routes: [{ name: ScreenNameEnum.TabNavigator }],
+                        routes: [{ name: ScreenNameEnum.HomeScreen }],
                     });
                   
                     return response
@@ -65,9 +61,11 @@ const SinupUserApi = async (param, setLoading) => {
         myHeaders.append("Accept", "application/json");
         const formData = new FormData();
         formData.append("mobile", param?.mobile);
+        formData.append("user_name", param?.fullName);
         formData.append("email", param?.email);
         formData.append("password", param?.password);
-        formData.append("type", param?.type);
+        formData.append("country", param?.county);
+        formData.append("city", param?.city);
         const requestOptions = {
             method: "POST",
             headers: myHeaders,
@@ -78,7 +76,7 @@ const SinupUserApi = async (param, setLoading) => {
         const res = await response.text();
         const jsonResponse = JSON.parse(res);
         setLoading(false);
-        if (jsonResponse?.status === "1") {
+        if (jsonResponse?.status == "1") {
             successToast(jsonResponse?.message);
             param?.navigation.navigate(ScreenNameEnum.LoginScreen);
             return jsonResponse;
@@ -240,60 +238,52 @@ const UpdatePassUserApi = async (
     }
 };
 
-const UpdateProfile_Api = async (
-    param,
-    setLoading,
-) => {
+const UpdateProfile_Api = async (param, setLoading) => {
     try {
-        setLoading(true)
-        console.log("param?.images?.path", param?.images?.path);
+        setLoading(true);
         const myHeaders = new Headers();
         myHeaders.append("Accept", "application/json");
+        
         const formData = new FormData();
-        if (param?.images) {
+        
+        // Append image if exists
+        if (param?.images && param.images.uri) {
             formData.append("image", {
-                uri: param?.images?.path,
-                type: 'image/jpeg',
-                name: 'image.jpg'
+                uri: param.images.uri,
+                type: param.images.mime || 'image/jpeg',
+                name: 'profile_image.jpg'
             });
         }
+        
+        // Append other form data
         formData.append("user_id", param?.userId);
         formData.append("user_name", param?.name);
         formData.append("mobile", param?.mobile);
         formData.append("email", param?.email);
+        
         const requestOptions = {
             method: "POST",
             headers: myHeaders,
             body: formData,
         };
-        const respons = await fetch(`${base_url}${constant.updateProfile}`, requestOptions)
-            .then((response) => response.text())
-            .then((res) => {
-                const response = JSON.parse(res);
-                if (response.status == '1') {
-                    setLoading(false)
-                    successToast(
-                        response?.message
-                    );
-                    param.navigation.goBack()
-                    // param.navigation.navigate(ScreenNameEnum.TabNavigator)
-                    return response
-                } else {
-                    setLoading(false)
-                    errorToast(
-                        response?.message || response?.error,
-                    );
-                    return response
-                }
-            })
-            .catch((error) =>
-                console.error(error));
-        return respons
+
+        const response = await fetch(`${base_url}${constant.updateProfile}`, requestOptions);
+        const responseText = await response.text();
+        const result = JSON.parse(responseText);
+        
+        if (result.status == '1') {
+            successToast(result?.message);
+            param.navigation.goBack();
+            return result;
+        } else {
+            errorToast(result?.message || result?.error);
+            return result;
+        }
     } catch (error) {
-        setLoading(false)
-        errorToast(
-            'Network error',
-        );
+        console.error('API Error:', error);
+        errorToast('Network error');
+    } finally {
+        setLoading(false);
     }
 };
 
@@ -312,7 +302,8 @@ const GetProfile = async (userId, dispatch) => {
         const response = await fetch(`${base_url}${constant.getrofile}`, requestOptions)
         const resText = await response.text(); // Ensure text is received before parsing
         const responseData = JSON.parse(resText);
-        if (responseData.status === '1') {
+        if (responseData.status == '1') {
+            console.log("responseData.status",responseData.result)
             dispatch(
                 getSuccess({
                     userGetData: responseData.result,

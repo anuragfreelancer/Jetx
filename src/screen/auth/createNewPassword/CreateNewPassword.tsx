@@ -72,7 +72,7 @@ export default function CreateNewPassword() {
               showEye={true}
               img={imageIndex.lock}
             />
-            {/* {errors.password ? <Text style={{ color: 'red', fontSize: 12,marginTop:8 }}>{errors.password}</Text> : null} */}
+            {errors.password ? <Text style={{ color: 'red', fontSize: 14,marginTop:8 }}>{errors.password}</Text> : null}
             <View style={{ marginTop: 12 }}>
               <TextInputField
                 lable={"Confirm Password"}
@@ -84,7 +84,7 @@ export default function CreateNewPassword() {
                 img={imageIndex.lock}
               />
             </View>
-            {/* {errors.confirmPassword ? <Text style={{ color: 'red', fontSize: 12 ,marginTop:10}}>{errors.confirmPassword}</Text> : null} */}
+            {errors.confirmPassword ? <Text style={{ color: 'red', fontSize: 14 ,marginTop:10}}>{errors.confirmPassword}</Text> : null}
           </View>
         </View>
 
@@ -95,10 +95,9 @@ export default function CreateNewPassword() {
       }}>
         <CustomButton
           title={'Save'}
-          // onPress={handleResetPass
-          // }
-          onPress={()=>navigation.navigate(ScreenNameEnum.LoginScreen)}
-
+          onPress={handleResetPass
+          }
+ 
           buttonStyle={{ width: "100%", marginTop: 28 }}
         />
 

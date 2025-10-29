@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { SinupUserApi } from '../../../redux/Api/AuthApi';
+import { LoginUserApi, SinupUserApi } from '../../../redux/Api/AuthApi';
 import { RootStackParamList } from './LoginTypes';
+import { useDispatch } from 'react-redux';
  
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const useLogin = () => {
@@ -14,10 +15,10 @@ interface Credentials {
 }
 
 const [credentials, setCredentials] = useState<Credentials>({
-  email: 'Aman@gmail.com',
-  password: '123456',
+  email: 'Gsp@gmail.com',
+  password: '12345678',
 });
-
+const dispatch = useDispatch()
 const handleChange = (field: keyof Credentials, value: string) => {
   setCredentials((prev) => ({ ...prev, [field]: value }));
   setErrors((prev) => ({ ...prev, [field]: '' }));
@@ -51,8 +52,9 @@ const handleChange = (field: keyof Credentials, value: string) => {
         email: credentials?.email,
         password: credentials?.password,
          navigation: navigation,
+         dispatch:dispatch
        };
-       const response = await SinupUserApi(params, setisLoading);
+       const response = await LoginUserApi(params, setisLoading);
     } catch (error) {
       console.error("Signup Error:", error);
     }

@@ -26,7 +26,8 @@ export default function SignUp() {
     errors,
     isLoading,
      navigation, 
-     handleChange
+     handleChange,
+     handleLogin
   } = useLogin()
   interface Option {
     team_name: string;
@@ -45,7 +46,7 @@ export default function SignUp() {
             backgroundColor: '#FFF',
             padding: 15,
             flex: 1,
-            marginTop: hp(5)
+            marginTop: hp(15)
           }}>
           <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
 
@@ -64,6 +65,8 @@ export default function SignUp() {
            <TextInputField
   placeholder={'Email Address'}
   text={credentials.email}
+                img={imageIndex.Fideuser}
+
   firstLogo={true}
   onChangeText={(value:any) => handleChange('email', value)}
  />
@@ -99,13 +102,25 @@ export default function SignUp() {
 
           <CustomButton
             title={'Sign In'}
-            onPress={() => navigation.navigate(ScreenNameEnum.HomeScreen)}
-
+            onPress={handleLogin}
+ 
             buttonStyle={{ width: "100%", marginTop: 30 }}
           />
         </View>
 
-        <View
+     
+        {/* <Text style={{ marginTop: 40, fontSize: 16, lineHeight: 22, color: 'black', textAlign: "center", fontWeight: "500" }}>
+          OR
+        </Text>
+        <View style={{ alignItems: 'center', marginTop:20}}>
+
+          <Image
+            source={imageIndex.google}
+            style={{ height: 80, width: 200 }} resizeMode='contain'
+          />
+        </View> */}
+      </ScrollView>
+   <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -123,18 +138,6 @@ export default function SignUp() {
             <Text style={Styles.text}> Sign Up</Text>
           </TouchableOpacity>
         </View>
-        <Text style={{ marginTop: 40, fontSize: 16, lineHeight: 22, color: 'black', textAlign: "center", fontWeight: "500" }}>
-          OR
-        </Text>
-        <View style={{ alignItems: 'center', marginTop:20}}>
-
-          <Image
-            source={imageIndex.google}
-            style={{ height: 80, width: 200 }} resizeMode='contain'
-          />
-        </View>
-      </ScrollView>
-
     </SafeAreaView>
   );
 }
