@@ -12,224 +12,255 @@ import {
 import imageIndex from '../../../assets/imageIndex';
 import StatusBarComponent from '../../../compoent/StatusBarCompoent';
 import CustomButton from '../../../compoent/CustomButton';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import styles from './style';
 
-const JetDetails = () => {
-    const amenitiesImages = [
-        'https://via.placeholder.com/120x80',
-        'https://via.placeholder.com/120x80',
-        'https://via.placeholder.com/120x80',
-    ];
+const FlightDetails = () => {
+    const route = useRoute();
+    const flight = route.params?.flight;
 
-    const renderAmenityImage = ({ item }: any) => (
-        <Image source={imageIndex.fliteBag} style={styles.amenityImage} />
-    );
-    const navigation = useNavigation<any>()
-    const reviews = [
-        {
-            id: '1',
-            name: 'Kadin Calzonl',
-            text: 'The lavatories are very professional and the sounds also surprisingly low. It was very smooth',
-            image: 'https://randomuser.me/api/portraits/women/1.jpg',
-        },
-        {
-            id: '2',
-            name: 'Hanna Dokidis',
-            text: 'Great luxury experience!',
-            image: 'https://randomuser.me/api/portraits/women/2.jpg',
-        },
-    ];
+ 
+    const navigation = useNavigation<any>();
 
-    const AmenityItem = ({ label, label2 }: any) => (
-        <View style={styles.amenityItem}>
-            <Image style={{
-                height: 24,
-                width: 24
-            }} source={imageIndex.bageverfiyPng}
+    if (!flight) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Text>No flight data available</Text>
+            </SafeAreaView>
+        );
+    }
 
-                resizeMode='contain'
-            />
-            <Text style={styles.amenityText}>{label}</Text>
-            <Image style={{
-                height: 24,
-                width: 24,
-                marginLeft: 13
-            }} source={imageIndex.bageverfiyPng}
+    const { itineraries, price, travelerPricings } = flight;
+    const segments = itineraries[0]?.segments || [];
+    const firstSegment = segments[0];
+    const lastSegment = segments[segments.length - 1];
 
-                resizeMode='contain'
-            />
-            <Text style={[styles.amenityText, {
-                marginLeft: 5,
+    // Format duration for display
+    const formatDuration = (duration) => {
+        return duration.replace('PT', '').replace('H', 'h ').replace('M', 'm');
+    };
 
-            }]}>{label2}</Text>
+    // Format date for display
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            weekday: 'short', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+    };
+
+    // Format time for display
+    const formatTime = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false 
+        });
+    };
+
+ 
+    const renderAmenityItem = ({ item }) => (
+        <View style={styles.amenityCard}>
+            <Image source={item.icon} style={styles.amenityIcon} />
+            <Text style={styles.amenityTitle}>{item.title}</Text>
+            <Text style={styles.amenityDesc}>{item.description}</Text>
         </View>
     );
 
-    const ReviewItem = ({ name, text, image }: any) => (
-        <View style={{ marginTop: 10 }}>
-            <View style={styles.reviewItem}>
-                <Image source={{ uri: image }} style={styles.avatar} />
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flex: 1,
-                        marginLeft: 10,
-                    }}
-                >
-                    <Text style={styles.reviewName}>{name}</Text>
-                    <Image
-                        source={imageIndex.viewStar}
-                        style={{ height: 13, width: 78 }}
-                        resizeMode="contain"
-                    />
+    const renderSegment = (segment, index) => (
+        <View key={segment.id} style={styles.segmentContainer}>
+            <View style={styles.segmentHeader}>
+                <Text style={styles.flightNumber}>
+                    {segment.carrierCode} {segment.number}
+                </Text>
+                <Text style={styles.duration}>
+                    {formatDuration(segment.duration)}
+                </Text>
+            </View>
+            
+            <View style={styles.routeContainer}>
+                <View style={styles.airportInfo}>
+                    <Text style={styles.time}>
+                        {formatTime(segment.departure.at)}
+                    </Text>
+                    <Text style={styles.airportCode}>
+                        {segment.departure.iataCode}
+                    </Text>
+                    <Text style={styles.terminal}>
+                        Terminal {segment.departure.terminal}
+                    </Text>
+                </View>
+
+                <View style={styles.flightPath}>
+                    <View style={styles.dot} />
+                    <View style={styles.line} />
+                    <View style={styles.dot} />
+                </View>
+
+                <View style={styles.airportInfo}>
+                    <Text style={styles.time}>
+                        {formatTime(segment.arrival.at)}
+                    </Text>
+                    <Text style={styles.airportCode}>
+                        {segment.arrival.iataCode}
+                    </Text>
+                    <Text style={styles.terminal}>
+                        Terminal {segment.arrival.terminal}
+                    </Text>
                 </View>
             </View>
-            <Text style={styles.reviewText}>{text}</Text>
-            <View
-                style={{
-                    borderBottomWidth: 1,
-                    marginTop: 15,
-                    borderColor: '#CEC9C1',
-                }}
-            />
+
+            <View style={styles.flightInfo}>
+                <Text style={styles.aircraft}>
+                    Aircraft: {segment.aircraft.code}
+                </Text>
+                <Text style={styles.cabin}>
+                    Cabin: {segment.cabin}
+                </Text>
+            </View>
+
+            {index < segments.length - 1 && (
+                <View style={styles.layoverContainer}>
+                    <Text style={styles.layoverText}>
+                        Layover: {formatDuration('PT3H50M')} {/* Calculate actual layover */}
+                    </Text>
+                </View>
+            )}
         </View>
     );
+
     return (
-        <SafeAreaView style={{
-            backgroundColor: "white",
-            flex: 1
-        }}>
+        <SafeAreaView style={styles.container}>
             <StatusBarComponent />
-            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+                {/* Header with Flight Info */}
                 <ImageBackground
-                    source={imageIndex.filtie}
-                    style={{
-                        height: 430,
-                        paddingHorizontal: 18,
-                        paddingBottom: 20,
-                        overflow: 'hidden',
+                    source={{
+                        uri:"https://images.unsplash.com/photo-1556388158-158ea5ccacbd?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8ZmxpZ2h0fGVufDB8fDB8fHww&fm=jpg&q=60&w=3000"
                     }}
+                    // source={imageIndex.filtie}
+                    style={styles.headerBackground}
                     resizeMode='cover'
                 >
-                    <View style={{ marginTop: 15 }}
-                    >
-                        <TouchableOpacity
-                            onPress={() => navigation.goBack()}
-                        >
-                            <Image source={imageIndex.backorange}
-                                style={styles.img}
+                    <View style={styles.headerContent}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Image 
+                                source={imageIndex.backorange} 
+                                style={styles.backIcon}
                                 tintColor={"white"}
                                 resizeMode='contain'
                             />
                         </TouchableOpacity>
-                    </View>
-                    <View style={{
-                        justifyContent: 'flex-end',
-                        overflow: 'hidden',
-                        flex: 1
-                    }}>
-                        <Text style={styles.title}>Gulfstream G650</Text>
-                        <View style={styles.featuresRow}>
-                            <View style={{
-                                flexDirection: "row",
-                            }}>
-                                <Image
-                                    source={imageIndex.seta}
-                                    style={styles.img}
-                                />
-                                <View>
-                                    <Text style={styles.bagText}>Seating Capacity</Text>
-                                    <Text style={styles.bagSum}>18</Text>
-
-                                </View>
+                        
+                        <View style={styles.routeSummary}>
+                            <View style={styles.airportCodes}>
+                                <Text style={styles.airportCodeLarge}>
+                                    {firstSegment?.departure.iataCode}
+                                </Text>
+                                <Text style={styles.routeArrow}>→</Text>
+                                <Text style={styles.airportCodeLarge}>
+                                    {lastSegment?.arrival.iataCode}
+                                </Text>
                             </View>
-                            <View style={{
-                                flexDirection: "row",
-                                marginLeft: 18
-                            }}>
-                                <Image
-                                    source={imageIndex.time}
-                                    style={{ height: 34, width: 34 }}
-                                />
-                                <View>
-                                    <Text style={styles.bagText}>Speed</Text>
-                                    <Text style={styles.bagSum}>18</Text>
-                                </View>
-                            </View>
-                            <View style={{
-                                flexDirection: "row",
-                                marginLeft: 18
-                            }}>
-                                <Image
-                                    source={imageIndex.seped}
-                                    style={{ height: 34, width: 34 }}
-                                />
-                                <View>
-                                    <Text style={styles.bagText}>Range</Text>
-                                    <Text style={styles.bagSum}>7,500 miles</Text>
-
-                                </View>
-                            </View>
+                            <Text style={styles.flightRoute}>
+                                {firstSegment?.departure.iataCode} to {lastSegment?.arrival.iataCode}
+                            </Text>
+                            <Text style={styles.flightDate}>
+                                {formatDate(firstSegment?.departure.at)}
+                            </Text>
                         </View>
-                        <Text style={styles.priceText}>$15,000/hr</Text>
+
+                        <View style={styles.priceContainer}>
+                            <Text style={styles.priceTotal}>€{price.total}</Text>
+                            <Text style={styles.priceDescription}>Total per passenger</Text>
+                        </View>
                     </View>
                 </ImageBackground>
+
+                {/* Flight Segments */}
                 <View style={styles.detailsContainer}>
-                    <Text style={styles.sectionTitle}>Amenities</Text>
+                    <Text style={styles.sectionTitle}>Flight Details</Text>
+                    {segments.map(renderSegment)}
+                    
+                    <View style={styles.totalDuration}>
+                        <Text style={styles.totalDurationText}>
+                            Total Duration: {formatDuration(itineraries[0]?.duration)}
+                        </Text>
+                    </View>
+                </View>
+
+         
+                {/* <View style={styles.detailsContainer}>
+                    <Text style={styles.sectionTitle}>Included Amenities</Text>
                     <FlatList
                         horizontal
-                        data={amenitiesImages}
-                        renderItem={renderAmenityImage}
-                        keyExtractor={(_, index) => index.toString()}
+                        data={amenities}
+                        renderItem={renderAmenityItem}
+                        keyExtractor={item => item.id}
                         showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ marginVertical: 10, marginTop: 15 }}
+                        contentContainerStyle={styles.amenitiesList}
                     />
-                    <Text style={[styles.sectionTitle, {
-                        marginTop: 15
-                    }]}>Amenities</Text>
-                    <View style={styles.amenitiesList}>
-                        <AmenityItem label="Wi-Fi" label2={"4K Entertainment System"} />
-                        <AmenityItem label="Private Bedroom" label2={"Fine Dining & Catering"} />
-                    </View>
+                </View> */}
 
-                    <View style={styles.reviewHeader}>
-                        <Text style={styles.sectionTitle}>Review</Text>
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <Image style={{
-                                height: 24,
-                                width: 24
-                            }}
-                                resizeMode='contain'
-                                source={imageIndex.messEdit} />
-                            <Text style={styles.addReview}>Add Review</Text>
+                {/* Fare Details */}
+                <View style={styles.detailsContainer}>
+                    <Text style={styles.sectionTitle}>Fare Breakdown</Text>
+                    <View style={styles.fareBreakdown}>
+                        <View style={styles.fareRow}>
+                            <Text style={styles.fareLabel}>Base Fare</Text>
+                            <Text style={styles.fareValue}>€{price.base}</Text>
+                        </View>
+                        <View style={styles.fareRow}>
+                            <Text style={styles.fareLabel}>Taxes & Fees</Text>
+                            <Text style={styles.fareValue}>€{(parseFloat(price.total) - parseFloat(price.base)).toFixed(2)}</Text>
+                        </View>
+                        <View style={styles.fareRow}>
+                            <Text style={styles.fareLabel}>Checked Bags</Text>
+                            <Text style={styles.fareValue}>
+                                {travelerPricings[0]?.fareDetailsBySegment[0]?.includedCheckedBags?.quantity || 0} included
+                            </Text>
+                        </View>
+                        <View style={[styles.fareRow, styles.totalRow]}>
+                            <Text style={styles.totalLabel}>Total</Text>
+                            <Text style={styles.totalValue}>€{price.total}</Text>
                         </View>
                     </View>
-                    <FlatList
-                        data={reviews}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <ReviewItem name={item.name} text={item.text} image={item.image} />
-                        )}
-                        contentContainerStyle={{ padding: 10 }}
-                    />
+                </View>
+
+                {/* Additional Info */}
+                <View style={styles.detailsContainer}>
+                    <Text style={styles.sectionTitle}>Additional Information</Text>
+                    <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>Airline:</Text>
+                        <Text style={styles.infoValue}>Air India (AI)</Text>
+                    </View>
+                    <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>Fare Type:</Text>
+                        <Text style={styles.infoValue}>ECO VALUE</Text>
+                    </View>
+                    <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>Ticket Type:</Text>
+                        <Text style={styles.infoValue}>Refundable & Changeable</Text>
+                    </View>
+                    <View style={styles.infoItem}>
+                        <Text style={styles.infoLabel}>Last Booking Date:</Text>
+                        <Text style={styles.infoValue}>
+                            {new Date(flight.lastTicketingDate).toLocaleDateString()}
+                        </Text>
+                    </View>
                 </View>
             </ScrollView>
+
             <CustomButton
                 title={'Book Now'}
-                onPress={() => navigation.navigate(ScreenNameEnum.BookNow)}
-                buttonStyle={{ marginHorizontal: 17, marginTop: 20, marginBottom: 12 }}
+                onPress={() => navigation.navigate(ScreenNameEnum.BookNow, { flight })}
+                buttonStyle={styles.bookButton}
             />
         </SafeAreaView>
     );
 };
 
-
-
-
-
-
-export default JetDetails;
+export default FlightDetails;

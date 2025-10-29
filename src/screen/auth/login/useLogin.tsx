@@ -8,14 +8,20 @@ const useLogin = () => {
   const [errors, setErrors] = useState<any>({});
   const navigation = useNavigation<RootStackParamList>();
   const [isLoading, setisLoading] = useState(false)
-   const [credentials, setCredentials] = useState({
-    email: '',
-    password: '',
-   });
-  const handleChange = (field: string, value: string) => {
-    setCredentials((prev: any) => ({ ...prev, [field]: value }));
-    setErrors((prev: any) => ({ ...prev, [field]: '' })); // Clear error on input change
-  };
+interface Credentials {
+  email: string;
+  password: string;
+}
+
+const [credentials, setCredentials] = useState<Credentials>({
+  email: 'Aman@gmail.com',
+  password: '123456',
+});
+
+const handleChange = (field: keyof Credentials, value: string) => {
+  setCredentials((prev) => ({ ...prev, [field]: value }));
+  setErrors((prev) => ({ ...prev, [field]: '' }));
+};
   const validateFields = () => {
     const { email, password } = credentials;
     let validationErrors: any = {};

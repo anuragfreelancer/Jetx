@@ -22,6 +22,8 @@ import BookingHistory from "../screen/home/profile/bookingHistory/BookingHistory
 import SavedPreferences from "../screen/home/savedPreferences/SavedPreferences";
 import PaymentMethods from "../screen/home/paymentMethods/PaymentMethods";
 import Notification from "../screen/home/notification/Notification";
+import FlightOffersScreen from "../screen/home/homeScreen/FlightOffersScreen";
+import PrivateJetBoking from "../screen/home/PrivateJetBoking/PrivateJetBoking";
  
 const useAuth = () => {
   return useSelector((state: any) => state?.auth);
@@ -53,6 +55,11 @@ const _routes = () => {
        { name: ScreenNameEnum.SavedPreferences, Component: SavedPreferences },
        { name: ScreenNameEnum.PaymentMethods, Component: PaymentMethods },
        { name: ScreenNameEnum.Notifications, Component: Notification },
+
+
+
+       { name: "FlightOffersScreen", Component: FlightOffersScreen },
+       { name: "PrivateJetBoking", Component: PrivateJetBoking },
      ],
 
   

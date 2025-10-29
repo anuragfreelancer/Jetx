@@ -26,6 +26,7 @@ export default function SignUp() {
     errors,
     isLoading,
      navigation, 
+     handleChange
   } = useLogin()
   interface Option {
     team_name: string;
@@ -60,20 +61,23 @@ export default function SignUp() {
 
           </View>
           <View style={{ marginTop: ResponsiveSize.marginTop(25), paddingVertical: hp(2), }}>
-            <TextInputField
-              placeholder={'Email Address '}
-              text={credentials.email}
-              firstLogo={true}
-              img={imageIndex.emai}
-            />
+           <TextInputField
+  placeholder={'Email Address'}
+  text={credentials.email}
+  firstLogo={true}
+  onChangeText={(value:any) => handleChange('email', value)}
+ />
             {errors.email ? <Text style={{ color: 'red', fontSize: 12, marginTop: 10 }}>{errors.email}</Text> : null}
 
             <TextInputField
               lable={"Password"}
               placeholder="Password"
               firstLogo={true}
-              showEye={true}
+               text={credentials.password}
+               showEye={true}
               img={imageIndex.lock}
+                onChangeText={(value:any) => handleChange('password', value)}
+
             />
 
 
@@ -95,7 +99,7 @@ export default function SignUp() {
 
           <CustomButton
             title={'Sign In'}
-            onPress={() => navigation.navigate(ScreenNameEnum.AddProfilePicture)}
+            onPress={() => navigation.navigate(ScreenNameEnum.HomeScreen)}
 
             buttonStyle={{ width: "100%", marginTop: 30 }}
           />

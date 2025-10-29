@@ -15,11 +15,8 @@ const LoadingModal = ({ visible }:any) => {
       visible={visible}
     >
       <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <ActivityIndicator size="large" color="#FF3B30"  style={{marginTop:10}} />
-          <Text style={styles.loadingText}>Please wait...</Text>
-        </View>
-      </View>
+           <ActivityIndicator size="large" color="#FF3B30"  style={{marginTop:10}} />
+       </View>
     </Modal>
   );
 };
@@ -30,6 +27,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',  // Semi-transparent background
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop:20
   },
   modalContainer: {
     backgroundColor: 'white',

@@ -9,6 +9,7 @@ export default {
   googlelogin: require('./images/googlelogin.png'),
   phone: require('./images/phone.png'),
   country: require('./images/country.png'),
+  swap: require('./images/swap.png'),
   mail: require('./images/mail.png'),
   otpBag: require('./images/otpBag.png'),
   Ellipse: require('./images/Ellipse.png'),

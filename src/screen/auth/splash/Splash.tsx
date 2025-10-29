@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet,   SafeAreaView } from 'react-native';
- import { useIsFocused, useNavigation } from '@react-navigation/native';
- import ScreenNameEnum from '../../../routes/screenName.enum';
-  import imageIndex from '../../../assets/imageIndex';
+    import imageIndex from '../../../assets/imageIndex';
 import StatusBarComponent from '../../../compoent/StatusBarCompoent';
  import useSplash from './useSplash';
 import { styles } from './style';

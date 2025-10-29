@@ -1,127 +1,521 @@
-
-import { StyleSheet } from 'react-native';
-
-
+import { StyleSheet, Platform } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-
+  },
+  keyboardView: {
+    flex: 1,
   },
   header: {
     backgroundColor: "#FF3B30",
-    justifyContent: 'center',
-    paddingHorizontal: 18,
-    marginBottom: 12
-  },
-  formContainer: {
-    backgroundColor: 'white',
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    alignItems: 'center',
-    flex: 1,
-    bottom: 40
+    justifyContent: 'flex-end',
+    paddingHorizontal: 24,
+    paddingBottom: 20,
   },
   headerContent: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "space-between",
+    marginBottom:40
+  },
+  greetingText: {
+    color: "rgba(255, 255, 255, 0.8)",
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 4,
   },
   headerText: {
     color: "white",
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "700",
-    lineHeight: 34
+    lineHeight: 36,
   },
-  profileImage: {
-    height: 55,
-    width: 92,
+  headerIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
   },
-
-  searchSection: { marginBottom: 20, },
-  input: {
-    borderWidth: 2,
-    borderColor: '#F6F3FF',
+  iconButton: {
+    padding: 4,
+  },
+  notificationIcon: {
+    height: 24,
+    width: 24,
+  },
+  profileIcon: {
+    height: 40,
+    width: 40,
     borderRadius: 20,
-    padding: 15,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FFD700',
+  },
+  formContainer: {
     backgroundColor: 'white',
-    height: 70,
-    marginTop: 10
-
-
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    flex: 1,
+    marginTop: -30,
   },
-  dateRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  dateInput: { flex: 1, marginRight: 8 },
-  searchButton: {
-    backgroundColor: '#FF3B30',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
+  scrollContent: {
+    paddingBottom: 30,
   },
-  searchButtonText: { color: '#fff', fontWeight: 'bold' },
-
-  jetSection: {},
-  jetHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10, marginTop: 30 },
-  jetTitle: {
-    fontSize: 18,
-    color: 'black',
-    fontWeight: '700',
-  },
-  viewAll: {
-    color: '#FF3B30', fontSize: 12,
-
-    fontWeight: '600',
-  },
-
-  card: {
-    backgroundColor: '#fff',
+  searchCard: {
+    backgroundColor: 'white',
+    marginHorizontal: 20,
+    marginTop: 20,
     borderRadius: 20,
-    padding: 8,
-    width: 333,
-    marginBottom: 20,
-    elevation: 1, // Android shadow
-    marginTop: 5,
-    
-    // iOS shadow
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    
-
-
+    shadowRadius: 12,
+    elevation: 8,
   },
-  cardImage: { width: 314, height: 105, marginTop: 8 },
-  cardTitle: { fontWeight: '700', fontSize: 16, marginTop: 10, color: "black", marginBottom: 5 },
-  cardInfo: { flexDirection: 'row', alignItems: 'center', marginTop: 5 },
-  cardText: { fontSize: 12, color: '#666', fontWeight: "500", marginLeft: 3 },
-  cardPrice: { color: '#FF3B30', fontWeight: '700', marginTop: 8, fontSize: 13, marginBottom: 5 },
-  inuptSum: {
-    color: "black",
-    right: 2,
-    fontWeight: "600",
+  searchTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 20,
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 20,
+  },
+  inputContainer: {
+    flex: 1,
+  },
+  inputLabel: {
     fontSize: 14,
-    bottom: 3
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 8,
   },
-  date: {
-    color: "black",
-    right: 2,
-    fontWeight: "600",
+  inputWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#f0f0f0',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    height: 56,
+    backgroundColor: '#fafafa',
+  },
+  inputIcon: {
+    height: 20,
+    width: 20,
+    marginRight: 12,
+    tintColor: 'red',
+  },
+  inputField: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1a1a1a',
+  },
+  swapButton: {
+    padding: 12,
+    marginHorizontal: 8,
+    marginBottom: 8,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 10,
+  },
+  swapIcon: {
+    height: 20,
+    width: 20,
+    tintColor: 'red',
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
+  },
+  dateInput: {
+    flex: 1,
+  },
+  dateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#f0f0f0',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    height: 56,
+    backgroundColor: '#fafafa',
+  },
+  dateIcon: {
+    height: 20,
+    width: 20,
+    marginRight: 12,
+    tintColor: '#666',
+  },
+  dateText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1a1a1a',
+  },
+  passengerContainer: {
+    marginBottom: 24,
+  },
+  passengerSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1.5,
+    borderColor: '#f0f0f0',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    height: 56,
+    backgroundColor: '#fafafa',
+  },
+  passengerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  passengerIcon: {
+    height: 20,
+    width: 20,
+    marginRight: 12,
+    tintColor: '#666',
+  },
+  passengerText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1a1a1a',
+  },
+  editButton: {
+    padding: 4,
+  },
+  editText: {
     fontSize: 14,
-    bottom: 3
+    fontWeight: '600',
+    color: '#FF3B30',
   },
-  depTitle:{
-                                      fontSize: 14,
-                                      color: '#C9C9C9',
-                                      fontWeight: '600',
-  
-                                  }
-
+  searchButton: {
+    backgroundColor: '#FF3B30',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#FF3B30',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  searchButtonDisabled: {
+    opacity: 0.7,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  flightsSection: {
+    marginTop: 8,
+    paddingHorizontal: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
+  resultsCount: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  flightCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    position: 'relative',
+  },
+  featuredFlightCard: {
+    borderColor: '#FF3B30',
+    borderWidth: 1.5,
+    backgroundColor: '#fffafa',
+  },
+  featuredBadge: {
+    position: 'absolute',
+    top: -6,
+    left: 16,
+    backgroundColor: '#FF3B30',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  featuredText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  flightHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  airlineContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  airlineText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  flightClass: {
+    fontSize: 12,
+    color: '#666',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  priceText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FF3B30',
+  },
+  flightRoute: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  routeSection: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  timeText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  airportText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  routeMiddle: {
+    alignItems: 'center',
+    flex: 2,
+  },
+  durationText: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  flightLineContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  flightDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FF3B30',
+  },
+  flightLine: {
+    flex: 1,
+    height: 2,
+    backgroundColor: '#ddd',
+    marginHorizontal: 4,
+  },
+  flightFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  stopsText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  selectText: {
+    fontSize: 14,
+    color: '#FF3B30',
+    fontWeight: '600',
+  },
+  viewMoreButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  viewMoreText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FF3B30',
+  },
+  jetSection: {
+    marginTop: 24,
+    paddingHorizontal: 20,
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  viewAllText: {
+    color: '#FF3B30',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  arrowIcon: {
+    height: 16,
+    width: 16,
+    tintColor: '#FF3B30',
+  },
+  jetList: {
+    paddingVertical: 8,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    marginRight: 16,
+    width: 280,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  cardImage: {
+    width: '100%',
+    height: 140,
+  },
+  cardImageStyle: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    padding: 12,
+  },
+  premiumBadge: {
+    backgroundColor: 'rgba(255, 215, 0, 0.9)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  premiumText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#000',
+  },
+  saveButton: {
+    padding: 4,
+  },
+  saveIcon: {
+    height: 20,
+    width: 20,
+    tintColor: 'white',
+  },
+  cardContent: {
+    padding: 16,
+  },
+  cardTitle: {
+    fontWeight: '700',
+    fontSize: 18,
+    color: "#1a1a1a",
+    marginBottom: 12,
+  },
+  cardInfo: {
+    gap: 8,
+    marginBottom: 12,
+  },
+  infoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  infoIcon: {
+    height: 16,
+    width: 16,
+    marginRight: 8,
+    tintColor: '#666',
+  },
+  cardText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: "500",
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  cardPrice: {
+    color: '#FF3B30',
+    fontWeight: '700',
+    fontSize: 20,
+    marginRight: 4,
+  },
+  perFlight: {
+    color: '#666',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  noDataContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  noDataIcon: {
+    height: 80,
+    width: 80,
+    marginBottom: 16,
+    opacity: 0.5, 
+    tintColor:"red"
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#999',
+    fontWeight: '500',
+  },
 });
+
 export default styles;
