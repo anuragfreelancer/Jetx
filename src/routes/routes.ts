@@ -24,6 +24,7 @@ import PaymentMethods from "../screen/home/paymentMethods/PaymentMethods";
 import Notification from "../screen/home/notification/Notification";
 import FlightOffersScreen from "../screen/home/homeScreen/FlightOffersScreen";
 import PrivateJetBoking from "../screen/home/PrivateJetBoking/PrivateJetBoking";
+import FlightBookingForm from "../compoent/FlightBookingForm";
  
 const useAuth = () => {
   return useSelector((state: any) => state?.auth);
@@ -59,6 +60,7 @@ const _routes = () => {
 
 
        { name: "FlightOffersScreen", Component: FlightOffersScreen },
+       { name: "FlightBookingFormScreen", Component: FlightBookingForm },
        { name: "PrivateJetBoking", Component: PrivateJetBoking },
      ],
 

@@ -8,6 +8,7 @@ import { persistor, store } from '../redux/store';
 import Toast from 'react-native-toast-message';
 import toastConfig from '../utils/customToast';
 import NetInfo from '@react-native-community/netinfo';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const AppNavigator: React.FC = () => {
   const [isConnected, setIsConnected] = useState(true);
@@ -25,11 +26,13 @@ const AppNavigator: React.FC = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GestureHandlerRootView style={{ flex: 1 }}>
+          <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
           <NavigationContainer>
         {/* <NetworkStatusModal modalVisible={modalVisible} offlineText="No Internet! Please check your connection." /> */} */}
             <RegistrationRoutes />
             <Toast config={toastConfig} />
           </NavigationContainer>
+          </SafeAreaView>
         </GestureHandlerRootView>
       </PersistGate>
     </Provider>

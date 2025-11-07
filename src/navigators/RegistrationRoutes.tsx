@@ -7,7 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 
 const RegistrationRoutes: FunctionComponent = () => {
-  const routes = _routes(); // पहले _routes() को कॉल करें
+  const routes = _routes(); 
 
   return (
     <Stack.Navigator

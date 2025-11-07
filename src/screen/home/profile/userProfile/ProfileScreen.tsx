@@ -51,7 +51,7 @@ const dispatch = useDispatch()
       <StatusBarComponent />
       <CustomHeader imageSource={imageIndex.backorange} label="Profile" />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={{
+        {/* <View style={{
           alignItems: 'center',
 
         }}>
@@ -67,7 +67,7 @@ const dispatch = useDispatch()
           
           <Text style={styles.name}>{userData?.user_name}</Text>
           <Text style={styles.editText}>{userData?.email}</Text>
-        </View>
+        </View> */}
         <FlatList
           data={MenuItems}
           renderItem={renderItem}

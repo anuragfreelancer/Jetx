@@ -1,5 +1,6 @@
 import React from 'react';
-import { StatusBar, SafeAreaView, View } from 'react-native';
+import { StatusBar, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type StatusBarComponentProps = {
   barStyle?: 'default' | 'light-content' | 'dark-content';
@@ -19,7 +20,7 @@ const StatusBarComponent: React.FC<StatusBarComponentProps> = ({
         backgroundColor={backgroundColor}
         translucent={translucent}
       />
-      <SafeAreaView style={{ backgroundColor }} />
+      {/* <SafeAreaView style={{ backgroundColor }} /> */}
     </>
   );
 };

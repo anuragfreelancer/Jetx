@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     FlatList,
     ImageBackground,
-    SafeAreaView,
+    
 } from 'react-native';
 import imageIndex from '../../../assets/imageIndex';
 import StatusBarComponent from '../../../compoent/StatusBarCompoent';
@@ -15,11 +15,12 @@ import CustomButton from '../../../compoent/CustomButton';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import styles from './style';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const FlightDetails = () => {
     const route = useRoute();
     const flight = route.params?.flight;
-
+console.log(flight)
  
     const navigation = useNavigation<any>();
 
@@ -133,7 +134,7 @@ const FlightDetails = () => {
     );
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <StatusBarComponent />
             <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
                 {/* Header with Flight Info */}
@@ -145,6 +146,7 @@ const FlightDetails = () => {
                     style={styles.headerBackground}
                     resizeMode='cover'
                 >
+                    <SafeAreaView edges={['top']}/>
                     <View style={styles.headerContent}>
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Image 
@@ -174,7 +176,7 @@ const FlightDetails = () => {
                         </View>
 
                         <View style={styles.priceContainer}>
-                            <Text style={styles.priceTotal}>€{price.total}</Text>
+                            <Text style={styles.priceTotal}>${price.total}</Text>
                             <Text style={styles.priceDescription}>Total per passenger</Text>
                         </View>
                     </View>
@@ -211,11 +213,11 @@ const FlightDetails = () => {
                     <View style={styles.fareBreakdown}>
                         <View style={styles.fareRow}>
                             <Text style={styles.fareLabel}>Base Fare</Text>
-                            <Text style={styles.fareValue}>€{price.base}</Text>
+                            <Text style={styles.fareValue}>${price.base}</Text>
                         </View>
                         <View style={styles.fareRow}>
                             <Text style={styles.fareLabel}>Taxes & Fees</Text>
-                            <Text style={styles.fareValue}>€{(parseFloat(price.total) - parseFloat(price.base)).toFixed(2)}</Text>
+                            <Text style={styles.fareValue}>${(parseFloat(price.total) - parseFloat(price.base)).toFixed(2)}</Text>
                         </View>
                         <View style={styles.fareRow}>
                             <Text style={styles.fareLabel}>Checked Bags</Text>
@@ -225,7 +227,7 @@ const FlightDetails = () => {
                         </View>
                         <View style={[styles.fareRow, styles.totalRow]}>
                             <Text style={styles.totalLabel}>Total</Text>
-                            <Text style={styles.totalValue}>€{price.total}</Text>
+                            <Text style={styles.totalValue}>${price.total}</Text>
                         </View>
                     </View>
                 </View>
@@ -257,9 +259,10 @@ const FlightDetails = () => {
             <CustomButton
                 title={'Book Now'}
                 onPress={() => navigation.navigate(ScreenNameEnum.BookNow, { flight })}
+                // onPress={() => navigation.navigate("FlightBookingFormScreen", { flight })}
                 buttonStyle={styles.bookButton}
             />
-        </SafeAreaView>
+        </View>
     );
 };
 

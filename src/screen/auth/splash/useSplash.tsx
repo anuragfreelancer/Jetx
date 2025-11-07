@@ -34,8 +34,10 @@ const getAmadeusToken = async () => {
       },
       body: new URLSearchParams({
         grant_type: 'client_credentials',
-        client_id: 'PkwRgnX14XGEMimEBzXbJW0ht6RCpRnY',
-        client_secret: 'EkF5onsjYbAAUzJR',
+        // client_id: 'PkwRgnX14XGEMimEBzXbJW0ht6RCpRnY',
+        // client_secret: 'EkF5onsjYbAAUzJR',
+        client_id: 'mmGclGTrso8FZZiO3pkGqpg8XyubxOQZ',
+        client_secret: 'HKjrHoyyGVFLNvMX',
       }).toString(),
     });
 

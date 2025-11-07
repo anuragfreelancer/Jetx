@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     headerBackground: {
-        height: 240,
+        height: 260,
         paddingHorizontal: 16,
         paddingBottom: 20,
         justifyContent: 'space-between',

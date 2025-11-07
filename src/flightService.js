@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const FLIGHT_API_BASE_URL = 'https://test.api.amadeus.com/v2';
+export const FLIGHT_API_BASE_URL = 'https://test.api.amadeus.com/';
 
 export const FlightService = {
   // Get flight offers
@@ -17,9 +17,12 @@ export const FlightService = {
       // Build query parameters
       const params = new URLSearchParams({
         originLocationCode: searchParams.origin,
+        currencyCode:'USD',
         destinationLocationCode: searchParams.destination,
         departureDate: searchParams.departureDate,
         adults: searchParams.adults || 1,
+       ...(searchParams.children && { children: searchParams.children.toString() }),
+    ...(searchParams.infants && { infants: searchParams.infants.toString() }),
         max: searchParams.max || 5
       });
 
@@ -27,7 +30,7 @@ export const FlightService = {
         params.append('returnDate', searchParams.returnDate);
       }
 
-      const url = `${FLIGHT_API_BASE_URL}/shopping/flight-offers?${params.toString()}`;
+      const url = `${FLIGHT_API_BASE_URL}/v2/shopping/flight-offers?${params.toString()}`;
 
       const response = await fetch(url, {
         method: 'GET',
@@ -49,12 +52,15 @@ export const FlightService = {
   },
 
   // Search flights with parameters
-  searchFlights: async (origin, destination, departureDate, returnDate, adults = 1) => {
+  searchFlights: async (origin, destination, departureDate, returnDate, adults = 1, children,
+        infants) => {
     const searchParams = {
       origin,
       destination,
       departureDate,
       adults,
+      children,
+      infants,
       max: 10
     };
 

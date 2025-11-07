@@ -18,7 +18,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
-    marginBottom:40
+    marginBottom:40,
+
   },
   greetingText: {
     color: "rgba(255, 255, 255, 0.8)",
@@ -36,6 +37,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
+    alignSelf:'flex-start'
   },
   iconButton: {
     padding: 4,
@@ -121,9 +123,10 @@ const styles = StyleSheet.create({
   },
   inputField: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     color: '#1a1a1a',
+    textAlignVertical:'center'
   },
   swapButton: {
     padding: 12,
@@ -162,7 +165,7 @@ const styles = StyleSheet.create({
     tintColor: '#666',
   },
   dateText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     color: '#1a1a1a',
   },
