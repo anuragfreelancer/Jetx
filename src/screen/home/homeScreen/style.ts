@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 56,
     backgroundColor: '#fafafa',
-  },
+   },
   inputIcon: {
     height: 20,
     width: 20,
@@ -126,7 +126,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#1a1a1a',
-    textAlignVertical:'center'
+    textAlignVertical:'center' ,
+    textAlign:"center"
   },
   swapButton: {
     padding: 12,

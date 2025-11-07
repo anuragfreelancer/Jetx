@@ -178,30 +178,30 @@ fetch("https://test.api.amadeus.com/v1/booking/flight-orders", requestOptions)
   const initialData = {
     traveler: {
       id: "1",
-      dateOfBirth: "1982-01-16",
+      dateOfBirth: "",
       name: {
-        firstName: "JORGE",
-        lastName: "GONZALES"
+        firstName: "",
+        lastName: ""
       },
       gender: "MALE",
       contact: {
-        emailAddress: "jorge.gonzales@example.com",
+        emailAddress: "",
         phones: [
           {
             deviceType: "MOBILE",
-            countryCallingCode: "34",
-            number: "480080076"
+            countryCallingCode: "",
+            number: ""
           }
         ]
       },
       documents: [
         {
-          documentType: "PASSPORT",
+          documentType: "",
           birthPlace: "Madrid",
-          issuanceLocation: "Madrid",
-          issuanceDate: "2025-04-14",
-          number: "00000000",
-          expiryDate: "2030-04-14",
+          issuanceLocation: "",
+          issuanceDate: " ",
+          number: "",
+          expiryDate: "",
           issuanceCountry: "ES",
           validityCountry: "ES",
           nationality: "ES",

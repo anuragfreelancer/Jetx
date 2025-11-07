@@ -75,12 +75,14 @@ const HomeScreen = () => {
   const getTotalPassengers = (): number => {
     return searchParams.adults + searchParams.children + searchParams.infants;
   };
+  const departureDat1e = new Date().toISOString().split('T')[0];
+
 
   // State for search parameters
   const [searchParams, setSearchParams] = useState({
     origin: '',
     destination: '',
-    departureDate: '2025-11-29',
+    departureDate: departureDat1e,
     returnDate: '',
     adults: 1,
     children: 0,
@@ -505,9 +507,13 @@ const HomeScreen = () => {
                     <Image source={imageIndex.location2} style={styles.inputIcon} />
                     <TouchableOpacity
                       // style={styles.button}
+                      style={{
+                        flex:1 ,
+                      
+                      }}
                       onPress={() => setIsModalVisible2(true)}
                     >
-                      <Text style={[styles.inputField, { maxWidth: '100%' }]} numberOfLines={1} >
+                    <Text style={[styles.inputField, { maxWidth: '100%' }]} numberOfLines={1} >
                         {searchParams.destination
                           ? `${searchParams.destination}`
                           : 'Des..'
