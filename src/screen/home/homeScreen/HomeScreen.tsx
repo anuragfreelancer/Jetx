@@ -444,7 +444,7 @@ const HomeScreen = () => {
               />
               <View style={styles.notificationBadge} />
             </TouchableOpacity>
-            {/* <TouchableOpacity
+            <TouchableOpacity
               style={styles.iconButton}
               onPress={() => navigation.navigate(ScreenNameEnum.ProfileScreen)}
             >
@@ -462,7 +462,7 @@ const HomeScreen = () => {
                 />
               )}
 
-            </TouchableOpacity> */}
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -506,17 +506,18 @@ const HomeScreen = () => {
                   <View style={styles.inputWithIcon}>
                     <Image source={imageIndex.location2} style={styles.inputIcon} />
                     <TouchableOpacity
-                      // style={styles.button}
-                      style={{
+                       style={{
                         flex:1 ,
-                      
+                        justifyContent:"center"
+                       ,
+                       alignItems:"center"
                       }}
                       onPress={() => setIsModalVisible2(true)}
                     >
-                    <Text style={[styles.inputField, { maxWidth: '100%' }]} numberOfLines={1} >
+                    <Text   >
                         {searchParams.destination
                           ? `${searchParams.destination}`
-                          : 'Des..'
+                          : 'To'
                         }
                       </Text>
                     </TouchableOpacity>
@@ -555,23 +556,48 @@ const HomeScreen = () => {
 
               {/* Date Pickers */}
               {showDeparturePicker && (
-                <DateTimePicker
+            <View style={{
+
+        borderWidth: 0.8,
+  borderColor: "red",
+  borderRadius: 20,
+  // Android shadow
+  elevation: 6,
+shadowOpacity: 0.45,
+shadowRadius: 12,
+shadowOffset: { width: 0, height: 10 },
+             }}> 
+    <DateTimePicker
                   value={getCurrentDate('departure')}
                   mode="date"
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                   onChange={onDateChange}
                   minimumDate={new Date()}
                 />
+
+            </View>
               )}
 
               {showReturnPicker && (
+                <View style={{
+
+        borderWidth: 0.8,
+  borderColor: "red",
+  borderRadius: 20,
+  // Android shadow
+  elevation: 6,
+shadowOpacity: 0.45,
+shadowRadius: 12,
+shadowOffset: { width: 0, height: 10 },
+             }}> 
                 <DateTimePicker
                   value={getCurrentDate('return')}
                   mode="date"
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                   onChange={onDateChange}
                   minimumDate={getMinReturnDate()}
-                />
+                /> 
+                </View>
               )}
 
               <View style={styles.passengerContainer}>

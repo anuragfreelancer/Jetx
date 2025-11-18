@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   profileIcon: {
     height: 40,
     width: 40,
-    borderRadius: 20,
+    borderRadius: 40,
   },
   notificationBadge: {
     position: 'absolute',
