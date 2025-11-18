@@ -26,7 +26,8 @@ import FlightOffersScreen from "../screen/home/homeScreen/FlightOffersScreen";
 import PrivateJetBoking from "../screen/home/PrivateJetBoking/PrivateJetBoking";
 import FlightBookingForm from "../compoent/FlightBookingForm";
 import PrivateJetScreen from "../screen/PrivateJets/PrivateJets";
- 
+ import SearchFlightsScreen from '../Aviapages/SearchFlightsScreen.js'
+ import PrivateJetsScreen from "../Aviapages/PrivateJetsScreen.js";
 const useAuth = () => {
   return useSelector((state: any) => state?.auth);
 };
@@ -35,7 +36,9 @@ const _routes = () => {
   const isLogin = useAuth(); // Hook function inside component/function
    return {
     REGISTRATION_ROUTE: [
-      { name: ScreenNameEnum.SPLASH_SCREEN, Component: Splash },
+            { name: ScreenNameEnum.SPLASH_SCREEN, Component: Splash },
+       
+
       { name: ScreenNameEnum.OnboardingScreen, Component: OnboardingScreen },
       { name: ScreenNameEnum.SignUpScreen, Component: SignUp },
       { name: ScreenNameEnum.LoginScreen, Component: Login },
@@ -64,7 +67,15 @@ const _routes = () => {
        { name: ScreenNameEnum.PrivateJetScreen, Component: PrivateJetScreen },
        { name: "FlightBookingFormScreen", Component: FlightBookingForm },
        { name: "PrivateJetBoking", Component: PrivateJetBoking },
-     ],
+
+
+
+
+
+            { name: "PrivateJetsScreen", Component: PrivateJetsScreen },
+
+             { name: "SearchFlightsScreen", Component: SearchFlightsScreen },
+      ],
 
   
   };
