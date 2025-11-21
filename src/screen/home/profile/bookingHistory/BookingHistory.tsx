@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,9 +11,88 @@ import {
 import StatusBarComponent from '../../../../compoent/StatusBarCompoent';
 import CustomHeader from '../../../../compoent/CustomHeader';
 import imageIndex from '../../../../assets/imageIndex';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BookingHistoryScreen = () => {
   const [activeTab, setActiveTab] = useState('Upcoming');
+
+  useEffect(()=>{
+    getUserBookings()
+  },[])
+
+  // singel bokking id
+const getUserBookings = async () => {
+  try {
+    const token = await AsyncStorage.getItem("AMADEUS_TOKEN");
+      const { access_token } = JSON.parse(token);
+
+
+    const flightOrderId = "eJzTd9c3D_EOCgsFAAtCAnk"; // dynamic later
+
+    const response = await fetch(
+      `https://test.api.amadeus.com/v1/booking/flight-orders/${flightOrderId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const result = await response.json();
+
+    console.log("📥 Bookings Response:", result);
+
+    if (!response.ok) {
+      const errorMsg =
+        result?.errors?.[0]?.detail ||
+        result?.errors?.[0]?.title ||
+        "Unable to fetch bookings";
+
+      throw new Error(errorMsg);
+    }
+
+    return result;
+  } catch (err) {
+    console.log("❌ Bookings Fetch Error:", err.message);
+    return { success: false, message: err.message };
+  }
+};
+
+
+
+
+
+
+
+
+
+// all boking lies user 
+
+// const getUserBookings = async () => {
+//   try {
+//     const userId = await AsyncStorage.getItem("USER_ID");
+
+//     const res = await fetch(
+//       `https://yourbackend.com/bookings?userId=${userId}`
+//     );
+
+//     const result = await res.json();
+
+//     console.log("📥 My Booking List:", result);
+
+//     if (!result.success) {
+//       throw new Error(result.message || "Unable to load bookings");
+//     }
+
+//     return result.bookings;
+//   } catch (error) {
+//     console.log("❌ Booking List Error:", error.message);
+//     return [];
+//   }
+// };
+
 
   const bookings = [
     {

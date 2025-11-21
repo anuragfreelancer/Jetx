@@ -5,8 +5,7 @@ import {
     Image,
     ScrollView,
     TouchableOpacity,
-    FlatList,
-    ImageBackground,
+     ImageBackground,
     
 } from 'react-native';
 import imageIndex from '../../../assets/imageIndex';
@@ -20,7 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const FlightDetails = () => {
     const route = useRoute();
     const flight = route.params?.flight;
-console.log(flight)
+console.log("flight",flight)
  
     const navigation = useNavigation<any>();
 
@@ -194,20 +193,7 @@ console.log(flight)
                     </View>
                 </View>
 
-         
-                {/* <View style={styles.detailsContainer}>
-                    <Text style={styles.sectionTitle}>Included Amenities</Text>
-                    <FlatList
-                        horizontal
-                        data={amenities}
-                        renderItem={renderAmenityItem}
-                        keyExtractor={item => item.id}
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.amenitiesList}
-                    />
-                </View> */}
-
-                {/* Fare Details */}
+          
                 <View style={styles.detailsContainer}>
                     <Text style={styles.sectionTitle}>Fare Breakdown</Text>
                     <View style={styles.fareBreakdown}>

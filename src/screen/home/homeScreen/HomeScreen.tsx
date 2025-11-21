@@ -420,10 +420,9 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBarComponent backgroundColor='#FF3B30' barStyle="light-content" />
-      {loading ? <LoadingModal /> : null}
-
-      {/* Header */}
-      <View style={[styles.header,]}>
+      
+ <LoadingModal visible={loading}/>
+       <View style={[styles.header,]}>
         <SafeAreaView edges={['top']} />
         <View style={styles.headerContent}>
           <View>
@@ -631,7 +630,7 @@ shadowOffset: { width: 0, height: 10 },
 
               {/* Search Button */}
               <CustomButton
-                title={loading ? 'Searching Flights...' : 'Search Flights'}
+                title={'Search Flights'}
                 buttonStyle={[
                   styles.searchButton,
                   loading && styles.searchButtonDisabled
@@ -641,12 +640,7 @@ shadowOffset: { width: 0, height: 10 },
               />
 
               {/* Loading Indicator */}
-              {loading && (
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="large" color="#FF3B30" />
-                  <Text style={styles.loadingText}>Searching for the best flights...</Text>
-                </View>
-              )}
+               
             </View>
 
             {/* Available Flights */}
@@ -678,7 +672,7 @@ shadowOffset: { width: 0, height: 10 },
 
             {/* Private Jets Section */}
             <View style={styles.jetSection}>
-              <View style={styles.sectionHeader}>
+              {/* <View style={styles.sectionHeader}>
                 <View>
                   <Text style={styles.sectionTitle}>Private Jets</Text>
                   <Text style={styles.sectionSubtitle}>Luxury travel experience</Text>
@@ -686,9 +680,9 @@ shadowOffset: { width: 0, height: 10 },
                 <TouchableOpacity style={styles.viewAllButton}>
                   <Text style={styles.viewAllText}>View All</Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
 
-              {privateJets.length > 0 ? (
+              {/* {privateJets.length > 0 ? (
                 <FlatList
                   horizontal
                   data={privateJets}
@@ -699,10 +693,10 @@ shadowOffset: { width: 0, height: 10 },
                 />
               ) : (
                 <View style={styles.noDataContainer}>
-                  {/* <Image source={imageIndex.boking} style={styles.noDataIcon} /> */}
+                  <Image source={imageIndex.boking} style={styles.noDataIcon} /> 
                   <Text style={styles.noDataText}>No private jets available</Text>
                 </View>
-              )}
+              )} */}
             </View>
           </ScrollView>
         </View>

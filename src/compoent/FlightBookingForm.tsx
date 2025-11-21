@@ -155,14 +155,7 @@ const FlightBookingForm = ({ onSubmit, initialData }) => {
     { value: 'OTHER', label: 'Other' },
   ];
 
-  // Phone types
-  const phoneTypes = [
-    { value: 'MOBILE', label: 'Mobile' },
-    { value: 'HOME', label: 'Home' },
-    { value: 'WORK', label: 'Work' },
-    { value: 'FAX', label: 'Fax' },
-  ];
-
+  
   // Initialize form with data if provided
   useEffect(() => {
     if (initialData) {

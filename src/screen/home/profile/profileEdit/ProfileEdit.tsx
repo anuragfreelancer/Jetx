@@ -10,6 +10,7 @@ import CustomButton from '../../../../compoent/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetProfile, UpdateProfile_Api } from '../../../../redux/Api/AuthApi';
+import LoadingModal from '../../../../utils/Loader';
 
 const ProfileEdit = () => {
   const navigation = useNavigation();
@@ -187,6 +188,7 @@ const ProfileEdit = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBarComponent />
       <CustomHeader imageSource={imageIndex.backorange} label="Edit Profile" />
+ <LoadingModal visible={loading}/>
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={{ alignItems: 'center' }}>
@@ -263,11 +265,9 @@ const ProfileEdit = () => {
           </View>
         </View>
       </ScrollView>
-
-      {/* Update Button */}
-      <View style={styles.buttonContainer}>
+       <View style={styles.buttonContainer}>
         <CustomButton
-          title={loading ? 'Updating...' : 'Update Profile'}
+          title={'Update Profile'}
           onPress={handleUpdateProfile}
           disabled={loading}
         />
