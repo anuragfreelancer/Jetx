@@ -697,6 +697,20 @@ shadowOffset: { width: 0, height: 10 },
                   <Text style={styles.noDataText}>No private jets available</Text>
                 </View>
               )} */}
+              <View style={{
+                marginHorizontal:20
+              }}>
+              <CustomButton
+                title={'Private Jets'}
+                buttonStyle={[
+                  styles.searchButton,
+                 ]}
+                onPress={()=>{
+                  navigation.navigate("PrivateJetsScreen")
+                }}
+                disabled={loading}
+              />
+              </View>
             </View>
           </ScrollView>
         </View>

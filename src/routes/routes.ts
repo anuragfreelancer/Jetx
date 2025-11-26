@@ -26,9 +26,13 @@ import FlightOffersScreen from "../screen/home/homeScreen/FlightOffersScreen";
 import PrivateJetBoking from "../screen/home/PrivateJetBoking/PrivateJetBoking";
 import FlightBookingForm from "../compoent/FlightBookingForm";
 import PrivateJetScreen from "../screen/PrivateJets/PrivateJets";
- import SearchFlightsScreen from '../Aviapages/SearchFlightsScreen.js'
- import PrivateJetsScreen from "../Aviapages/PrivateJetsScreen.js";
-const useAuth = () => {
+ import SearchFlightsScreen from '../Aviapages/SearchFlightsScreen.js'  ; 
+ import PrivateJetsScreen from '../screen/PrivateFlight/PrivateJetsScreen';
+ import JetDetailScreen from '../screen/PrivateFlight/JetDetailScreen';
+ import BookingFormScreen from '../screen/PrivateFlight/BookingFormScreen';
+ import PaymentScreen from '../screen/PrivateFlight/PaymentScreen';
+ import ConfirmationScreen from '../screen/PrivateFlight/ConfirmationScreen';
+ const useAuth = () => {
   return useSelector((state: any) => state?.auth);
 };
 
@@ -73,8 +77,12 @@ const _routes = () => {
 
 
             { name: "PrivateJetsScreen", Component: PrivateJetsScreen },
+            { name: "JetDetail", Component: JetDetailScreen },
+            { name: "BookingFormScreen", Component: BookingFormScreen },
+            { name: "PaymentScreen", Component: PaymentScreen },
+            { name: "ConfirmationScreen", Component: ConfirmationScreen },
 
-             { name: "SearchFlightsScreen", Component: SearchFlightsScreen },
+            //  { name: "SearchFlightsScreen", Component: SearchFlightsScreen },
       ],
 
   
