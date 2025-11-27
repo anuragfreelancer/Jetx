@@ -3,17 +3,14 @@ import {
   View,
   Text,
   ImageBackground,
-
   Image,
   FlatList,
-
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
-
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import imageIndex from '../../../assets/imageIndex';
@@ -22,25 +19,26 @@ import StatusBarComponent from '../../../compoent/StatusBarCompoent';
 import { useNavigation } from '@react-navigation/native';
 import ScreenNameEnum from '../../../routes/screenName.enum';
 import styles from './style';
-import { FlightService } from '../../../flightService';
 import LoadingModal from '../../../utils/Loader';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetProfile } from '../../../redux/Api/AuthApi';
 import AirportSearchModal from '../../../compoent/AirportSearchModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PassengerModal from '../../../compoent/PasengerSelectModal';
+import { AviapagesFlightService } from '../AviapagesFlightService';
 
 const HomeScreen = () => {
-
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const isLogin = useSelector((state: any) => state.auth);
   const userGet = useSelector((state: any) => state.feature);
   const userId = isLogin?.userData?.id;
-  const userData = userGet?.userGetData
+  const userData = userGet?.userGetData;
+
   useEffect(() => {
-    handleGetProfile()
-  }, [])
+    handleGetProfile();
+  }, []);
+
   const handleGetProfile = useCallback(async () => {
     if (userId) {
       await GetProfile(userId, dispatch);
@@ -50,14 +48,16 @@ const HomeScreen = () => {
   }, [userId, dispatch]);
 
   const [isPassengerModalVisible, setIsPassengerModalVisible] = useState(false);
-  const handlePassengerChange = (newCount: PassengerCount) => {
+  const [tripType, setTripType] = useState<'one-way' | 'round-trip'>('one-way'); // New state for trip type
+  
+  const handlePassengerChange = (newCount: any) => {
     setSearchParams(prev => ({
       ...prev,
       ...newCount,
     }));
   };
 
-  const getPassengerSummary = (): string => {
+  const getPassengerSummary = () => {
     const { adults, children, infants } = searchParams;
     let summary = `${adults} Adult${adults !== 1 ? 's' : ''}`;
 
@@ -72,17 +72,17 @@ const HomeScreen = () => {
     return summary;
   };
 
-  const getTotalPassengers = (): number => {
+  const getTotalPassengers = () => {
     return searchParams.adults + searchParams.children + searchParams.infants;
   };
-  const departureDat1e = new Date().toISOString().split('T')[0];
 
+  const departureDate = new Date().toISOString().split('T')[0];
 
   // State for search parameters
   const [searchParams, setSearchParams] = useState({
     origin: '',
     destination: '',
-    departureDate: departureDat1e,
+    departureDate: departureDate,
     returnDate: '',
     adults: 1,
     children: 0,
@@ -90,33 +90,27 @@ const HomeScreen = () => {
   });
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  // const [selectedAirport, setSelectedAirport] = useState(null);
   const [isModalVisible2, setIsModalVisible2] = useState(false);
-
-  const handleSelectAirport = (airport) => {
-    setSearchParams(prev => ({ ...prev, origin: airport.code }))
-
-  };
-
-  // const [selectedAirport, setSelectedAirport] = useState(null);
-
-  const handleSelectAirport2 = (airport) => {
-    // setSelectedAirport(airport);
-    setSearchParams(prev => ({ ...prev, destination: airport.code }))
-
-  };
-  // State for flight data
-  const [flights, setFlights] = useState([]);
+  const [flights, setFlights] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [privateJets, setPrivateJets] = useState([]);
+  const [privateJets, setPrivateJets] = useState<any[]>([]);
 
   // State for date picker
   const [showDeparturePicker, setShowDeparturePicker] = useState(false);
   const [showReturnPicker, setShowReturnPicker] = useState(false);
-  const [selectedDateType, setSelectedDateType] = useState(''); // 'departure' or 'return'
+  const [selectedDateType, setSelectedDateType] = useState('');
+
+  // Airport selection handlers
+  const handleSelectAirport = (airport: any) => {
+    setSearchParams(prev => ({ ...prev, origin: airport.code }));
+  };
+
+  const handleSelectAirport2 = (airport: any) => {
+    setSearchParams(prev => ({ ...prev, destination: airport.code }));
+  };
 
   // Format date for display
-  const formatDisplayDate = (dateString) => {
+  const formatDisplayDate = (dateString: string) => {
     if (!dateString) return 'Select date';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -127,12 +121,12 @@ const HomeScreen = () => {
   };
 
   // Format date for API (YYYY-MM-DD)
-  const formatDateForAPI = (date) => {
+  const formatDateForAPI = (date: Date) => {
     return date.toISOString().split('T')[0];
   };
 
   // Validate dates
-  const validateDates = (departureDate, returnDate) => {
+  const validateDates = (departureDate: string, returnDate: string) => {
     if (departureDate && returnDate) {
       const depDate = new Date(departureDate);
       const retDate = new Date(returnDate);
@@ -150,8 +144,7 @@ const HomeScreen = () => {
   };
 
   // Handle date change
-  const onDateChange = (event: any, selectedDate: any) => {
-    // Hide the picker
+  const onDateChange = (event: any, selectedDate?: Date) => {
     setShowDeparturePicker(false);
     setShowReturnPicker(false);
 
@@ -159,9 +152,8 @@ const HomeScreen = () => {
       const formattedDate = formatDateForAPI(selectedDate);
 
       if (selectedDateType === 'departure') {
-        // If setting departure date and return date exists, validate
         if (searchParams?.returnDate && !validateDates(formattedDate, searchParams?.returnDate)) {
-          return; // Don't update if validation fails
+          return;
         }
 
         setSearchParams(prev => ({
@@ -169,9 +161,8 @@ const HomeScreen = () => {
           departureDate: formattedDate
         }));
       } else if (selectedDateType === 'return') {
-        // If setting return date and departure date exists, validate
         if (searchParams.departureDate && !validateDates(searchParams.departureDate, formattedDate)) {
-          return; // Don't update if validation fails
+          return;
         }
 
         setSearchParams(prev => ({
@@ -181,18 +172,16 @@ const HomeScreen = () => {
       }
     }
 
-    // Reset selected date type
     setSelectedDateType('');
   };
 
-  // Show date picker with proper minimum date
-  const showDatePicker = (type) => {
+  // Show date picker
+  const showDatePicker = (type: string) => {
     setSelectedDateType(type);
 
     if (type === 'departure') {
       setShowDeparturePicker(true);
     } else if (type === 'return') {
-      // For return date, minimum date should be departure date + 1 day
       setShowReturnPicker(true);
     }
   };
@@ -202,14 +191,14 @@ const HomeScreen = () => {
     if (searchParams.departureDate) {
       const depDate = new Date(searchParams.departureDate);
       const minDate = new Date(depDate);
-      minDate.setDate(depDate.getDate() + 1); // Next day after departure
+      minDate.setDate(depDate.getDate() + 1);
       return minDate;
     }
-    return new Date(); // If no departure date, use today
+    return new Date();
   };
 
   // Get current date for date picker
-  const getCurrentDate = (type) => {
+  const getCurrentDate = (type: string) => {
     if (type === 'departure' && searchParams.departureDate) {
       return new Date(searchParams.departureDate);
     }
@@ -217,7 +206,6 @@ const HomeScreen = () => {
       return new Date(searchParams.returnDate);
     }
 
-    // For return date, if no date selected but departure exists, use next day
     if (type === 'return' && searchParams.departureDate) {
       const depDate = new Date(searchParams.departureDate);
       const nextDay = new Date(depDate);
@@ -228,43 +216,47 @@ const HomeScreen = () => {
     return new Date();
   };
 
-  // Fetch flight data
+  // Fetch flight data using Aviapages API
   const fetchFlights = async () => {
     try {
-      // Validate dates before searching
-      if (searchParams.returnDate && !validateDates(searchParams.departureDate, searchParams.returnDate)) {
+      if (tripType === 'round-trip' && searchParams.returnDate && !validateDates(searchParams.departureDate, searchParams.returnDate)) {
         return;
       }
 
       setLoading(true);
-      const data = await FlightService.searchFlights(
+      
+      console.log('🛫 Starting flight search with params:', {
+        origin: searchParams.origin,
+        destination: searchParams.destination,
+        departureDate: searchParams.departureDate,
+        returnDate: tripType === 'round-trip' ? searchParams.returnDate : '',
+        passengers: searchParams.adults + searchParams.children + searchParams.infants,
+        tripType: tripType
+      });
+
+      // Use Aviapages service with proper parameters
+      const data = await AviapagesFlightService.searchFlights(
         searchParams.origin,
         searchParams.destination,
         searchParams.departureDate,
-        searchParams.returnDate,
-        searchParams.adults,
-        searchParams.children,
-        searchParams.infants
+        tripType === 'round-trip' ? searchParams.returnDate : '',
+        searchParams.adults + searchParams.children + searchParams.infants
       );
 
-      setFlights(data.data || []);
-
-      // For demo, create private jets data from flight data
-      const jetsData = (data.data || []).slice(0, 3).map((flight, index) => ({
-        id: `jet-${index}`,
-        name: `Private Jet ${index + 1}`,
-        seats: Math.floor(Math.random() * 10) + 4,
-        speed: `${Math.floor(Math.random() * 500) + 500} km/h`,
-        range: `${Math.floor(Math.random() * 5000) + 3000} km`,
-        price: `$${Math.floor(Math.random() * 5000) + 2000}`,
-        image: imageIndex.flite
-      }));
-
-      setPrivateJets(jetsData);
+ 
+      if (data && data.data && data.data.length > 0) {
+        setFlights(data.data);
+        setPrivateJets(data.data.slice(0, 3)); // First 3 as private jets
+        Alert.alert('Success', `Found ${data.data.length} ${tripType} flights!`);
+      } else {
+        setFlights([]);
+        setPrivateJets([]);
+        Alert.alert('Info', `No ${tripType} flights found for your search criteria. Please try different airports or dates.`);
+      }
 
     } catch (error) {
-      console.error('Error fetching flights:', error);
-      Alert.alert('Error', 'Failed to fetch flight data. Please try again.');
+      console.error('❌ Error fetching flights from Aviapages:', error);
+      Alert.alert('Error', 'Failed to fetch flight data. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -272,12 +264,11 @@ const HomeScreen = () => {
 
   const handleSearch = () => {
     if (!searchParams.origin || !searchParams.destination || !searchParams.departureDate) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert('Error', 'Please fill in all required fields (From, To, and Departure Date)');
       return;
     }
 
-    // Validate dates before searching
-    if (searchParams.returnDate && !validateDates(searchParams.departureDate, searchParams.returnDate)) {
+    if (tripType === 'round-trip' && (!searchParams.returnDate || !validateDates(searchParams.departureDate, searchParams.returnDate))) {
       return;
     }
 
@@ -291,6 +282,14 @@ const HomeScreen = () => {
       origin: prev.destination,
       destination: prev.origin
     }));
+  };
+
+  // Handle trip type change
+  const handleTripTypeChange = (type: 'one-way' | 'round-trip') => {
+    setTripType(type);
+    if (type === 'one-way') {
+      setSearchParams(prev => ({ ...prev, returnDate: '' }));
+    }
   };
 
   useEffect(() => {
@@ -307,126 +306,142 @@ const HomeScreen = () => {
     }
   }, [searchParams.departureDate]);
 
-  // Render flight item for private jets section
-  const renderJetItem = ({ item }) => {
-    // console.log("isssssstem",item)
+  // Render private jet item
+  const renderJetItem = ({ item }: any) => {
+    const aircraftInfo = item.aircraftInfo || {};
+    
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() => navigation.navigate("PrivateJetBoking", { flightData: item })}
+        onPress={() => navigation.navigate("PrivateJetBoking", { 
+          flightData: item,
+          tripType: tripType,
+          searchParams: searchParams
+        })}
       >
-        <ImageBackground source={{
-          uri: "https://img.freepik.com/free-photo/airplane-aircraft-travel-trip_53876-30273.jpg"
-
-        }} style={styles.cardImage} imageStyle={styles.cardImageStyle}>
+        <ImageBackground 
+          source={{ uri: aircraftInfo.image }} 
+          style={styles.cardImage} 
+          imageStyle={styles.cardImageStyle}
+        >
         </ImageBackground>
 
         <View style={styles.cardContent}>
-          <Text style={styles.cardTitle}>{item.name}</Text>
+          <Text style={styles.cardTitle}>{aircraftInfo.name || 'Private Jet'}</Text>
+          {aircraftInfo.manufacturer && (
+            <Text style={styles.cardSubtitle}>{aircraftInfo.manufacturer} {aircraftInfo.model}</Text>
+          )}
+          
           <View style={styles.cardInfo}>
             <View style={styles.infoItem}>
               <Image source={imageIndex.seat} style={styles.infoIcon} />
-              <Text style={styles.cardText}>{item.seats} Seats</Text>
+              <Text style={styles.cardText}>{aircraftInfo.seats || 8} Seats</Text>
             </View>
             <View style={styles.infoItem}>
               <Image source={imageIndex.speed} style={styles.infoIcon} />
-              <Text style={styles.cardText}>{item.speed}</Text>
+              <Text style={styles.cardText}>{aircraftInfo.speed || '800 km/h'}</Text>
             </View>
             <View style={styles.infoItem}>
               <Image source={imageIndex.distance} style={styles.infoIcon} />
-              <Text style={styles.cardText}>{item.range}</Text>
+              <Text style={styles.cardText}>{aircraftInfo.range || '4000 km'}</Text>
             </View>
           </View>
+          
           <View style={styles.priceContainer}>
-            <Text style={styles.cardPrice}>{item.price}</Text>
-            <Text style={styles.perFlight}>/ flight</Text>
+            <Text style={styles.cardPrice}>${item.price?.total || '5000'}</Text>
+            <Text style={styles.perFlight}>/ {tripType === 'one-way' ? 'one-way' : 'round-trip'}</Text>
           </View>
         </View>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   // Render flight offer item
-  const renderFlightItem = ({ item, index }) => (
-    <TouchableOpacity
-      style={[
-        styles.flightCard,
-        index === 0 && styles.featuredFlightCard
-      ]}
-      onPress={() => navigation.navigate(ScreenNameEnum.JetDetails, { flight: item })}
-    >
-      {index === 0 && (
-        <View style={styles.featuredBadge}>
-          <Text style={styles.featuredText}>BEST DEAL</Text>
-        </View>
-      )}
+  const renderFlightItem = ({ item, index }: any) => {
+    const aircraftInfo = item.aircraftInfo || {};
+    
+    return (
+      <TouchableOpacity
+        style={[
+          styles.flightCard,
+          index === 0 && styles.featuredFlightCard
+        ]}
+        onPress={() => navigation.navigate(ScreenNameEnum.JetDetails, { 
+          flight: item,
+          tripType: tripType,
+          searchParams: searchParams
+        })}
+      >
+        {index === 0 && (
+          <View style={styles.featuredBadge}>
+            <Text style={styles.featuredText}>BEST DEAL</Text>
+          </View>
+        )}
 
-      <View style={styles.flightHeader}>
-        <View style={styles.airlineContainer}>
-          <Text style={styles.airlineText}>
-            {item.validatingAirlineCodes?.[0] || 'Airline'}
-          </Text>
-          <Text style={styles.flightClass}>Economy</Text>
-        </View>
-        <Text style={styles.priceText}>${item.price?.total || 'N/A'}</Text>
-      </View>
-
-      <View style={styles.flightRoute}>
-        <View style={styles.routeSection}>
-          <Text style={styles.timeText}>
-            {new Date(item.itineraries[0].segments[0].departure.at).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </Text>
-          <Text style={styles.airportText}>{item.itineraries[0].segments[0].departure.iataCode}</Text>
+        <View style={styles.flightHeader}>
+          <View style={styles.airlineContainer}>
+            <Text style={styles.airlineText}>
+              {aircraftInfo.manufacturer || 'Private Jet'}
+            </Text>
+            <Text style={styles.flightClass}>{aircraftInfo.model || 'Business'}</Text>
+          </View>
+          <Text style={styles.priceText}>${item.price?.total || '5000'}</Text>
         </View>
 
-        <View style={styles.routeMiddle}>
-          <Text style={styles.durationText}>
-            {item?.itineraries[0].duration?.replace('PT', '').toLowerCase()}
-          </Text>
-          <View style={styles.flightLineContainer}>
-            <View style={styles.flightDot} />
-            <View style={styles.flightLine} />
-            <View style={styles.flightDot} />
+        <View style={styles.flightRoute}>
+          <View style={styles.routeSection}>
+            <Text style={styles.timeText}>
+              {item.itineraries?.[0]?.segments?.[0]?.departure?.at 
+                ? new Date(item.itineraries[0].segments[0].departure.at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                : '08:00'
+              }
+            </Text>
+            <Text style={styles.airportText}>{searchParams.origin}</Text>
+          </View>
+
+          <View style={styles.routeMiddle}>
+            <Text style={styles.durationText}>
+              {item.itineraries?.[0]?.duration?.replace('PT', '') || '2H 30M'}
+            </Text>
+            <View style={styles.flightLineContainer}>
+              <View style={styles.flightDot} />
+              <View style={styles.flightLine} />
+              <View style={styles.flightDot} />
+            </View>
+          </View>
+
+          <View style={styles.routeSection}>
+            <Text style={styles.timeText}>
+              {item.itineraries?.[0]?.segments?.[0]?.arrival?.at 
+                ? new Date(item.itineraries[0].segments[0].arrival.at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                : '10:30'
+              }
+            </Text>
+            <Text style={styles.airportText}>{searchParams.destination}</Text>
           </View>
         </View>
 
-        <View style={styles.routeSection}>
-          <Text style={styles.timeText}>
-            {new Date(
-              item.itineraries[0].segments[item.itineraries[0].segments.length - 1].arrival.at
-            ).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
+        <View style={styles.flightFooter}>
+          <Text style={styles.stopsText}>
+            {aircraftInfo.seats || 8} Seats • {aircraftInfo.model || 'Private Jet'}
           </Text>
-          <Text style={styles.airportText}>
-            {item.itineraries[0].segments[item.itineraries[0].segments.length - 1].arrival.iataCode}
-          </Text>
+          <Text style={styles.selectText}>View Details →</Text>
         </View>
-      </View>
-
-      <View style={styles.flightFooter}>
-        <Text style={styles.stopsText}>
-          {item.itineraries[0].segments.length - 1 === 0 ? 'Non-stop' : `${item.itineraries[0].segments.length - 1} stop(s)`}
-        </Text>
-        <Text style={styles.selectText}>Select →</Text>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <StatusBarComponent backgroundColor='#FF3B30' barStyle="light-content" />
       
- <LoadingModal visible={loading}/>
-       <View style={[styles.header,]}>
+      <LoadingModal visible={loading}/>
+      
+      <View style={[styles.header]}>
         <SafeAreaView edges={['top']} />
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.greetingText}>{userData?.user_name}, Welcome! 👋</Text>
+            <Text style={styles.greetingText}>{userData?.user_name || 'User'}, Welcome! 👋</Text>
             <Text style={styles.headerText}>
               Find Your Perfect{"\n"}Flight
             </Text>
@@ -447,20 +462,19 @@ const HomeScreen = () => {
               style={styles.iconButton}
               onPress={() => navigation.navigate(ScreenNameEnum.ProfileScreen)}
             >
-              {userData?.image ? (<Image
-                source={{
-                  uri: userData?.image
-                }}
-                style={styles.profileIcon}
-                resizeMode='contain'
-              />) : (
+              {userData?.image ? (
+                <Image
+                  source={{ uri: userData?.image }}
+                  style={styles.profileIcon}
+                  resizeMode='contain'
+                />
+              ) : (
                 <Image
                   source={imageIndex.Ellipse}
                   style={styles.profileIcon}
                   resizeMode='contain'
                 />
               )}
-
             </TouchableOpacity>
           </View>
         </View>
@@ -470,15 +484,46 @@ const HomeScreen = () => {
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {/* Search Form */}
         <View style={styles.formContainer}>
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
           >
-            {/* Search Card */}
+            
             <View style={styles.searchCard}>
               <Text style={styles.searchTitle}>Search Flights</Text>
+
+              {/* Trip Type Selector */}
+              <View style={styles.tripTypeContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.tripTypeButton,
+                    tripType === 'one-way' && styles.tripTypeButtonActive
+                  ]}
+                  onPress={() => handleTripTypeChange('one-way')}
+                >
+                  <Text style={[
+                    styles.tripTypeText,
+                    tripType === 'one-way' && styles.tripTypeTextActive
+                  ]}>
+                    One Way
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.tripTypeButton,
+                    tripType === 'round-trip' && styles.tripTypeButtonActive
+                  ]}
+                  onPress={() => handleTripTypeChange('round-trip')}
+                >
+                  <Text style={[
+                    styles.tripTypeText,
+                    tripType === 'round-trip' && styles.tripTypeTextActive
+                  ]}>
+                    Round Trip
+                  </Text>
+                </TouchableOpacity>
+              </View>
 
               {/* Location Inputs */}
               <View style={styles.locationContainer}>
@@ -486,13 +531,12 @@ const HomeScreen = () => {
                   <Text style={styles.inputLabel}>From</Text>
                   <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.inputWithIcon}>
                     <Image source={imageIndex.location2} style={styles.inputIcon} />
-                    <Text style={[styles.inputField, { maxWidth: '100%' }]} numberOfLines={1} >
+                    <Text style={[styles.inputField, { maxWidth: '100%' }]} numberOfLines={1}>
                       {searchParams.origin
                         ? `${searchParams.origin}`
                         : 'Departure city'
                       }
                     </Text>
-                    {/* </TouchableOpacity> */}
                   </TouchableOpacity>
                 </View>
 
@@ -505,15 +549,14 @@ const HomeScreen = () => {
                   <View style={styles.inputWithIcon}>
                     <Image source={imageIndex.location2} style={styles.inputIcon} />
                     <TouchableOpacity
-                       style={{
-                        flex:1 ,
-                        justifyContent:"center"
-                       ,
-                       alignItems:"center"
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center"
                       }}
                       onPress={() => setIsModalVisible2(true)}
                     >
-                    <Text   >
+                      <Text>
                         {searchParams.destination
                           ? `${searchParams.destination}`
                           : 'To'
@@ -539,63 +582,60 @@ const HomeScreen = () => {
                   </TouchableOpacity>
                 </View>
 
-                <View style={styles.dateInput}>
-                  <Text style={styles.inputLabel}>Return</Text>
-                  <TouchableOpacity
-                    style={styles.dateButton}
-                    onPress={() => showDatePicker('return')}
-                  >
-                    <Image source={imageIndex.calendar} style={styles.dateIcon} />
-                    <Text style={styles.dateText}>
-                      {formatDisplayDate(searchParams.returnDate)}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                {tripType === 'round-trip' && (
+                  <View style={[styles.dateInput,]}>
+                    <Text style={styles.inputLabel}>Return</Text>
+                    <TouchableOpacity
+                      style={styles.dateButton}
+                      onPress={() => showDatePicker('return')}
+                    >
+                      <Image source={imageIndex.calendar} style={styles.dateIcon} />
+                      <Text style={styles.dateText}>
+                        {formatDisplayDate(searchParams.returnDate)}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
 
               {/* Date Pickers */}
               {showDeparturePicker && (
-            <View style={{
-
-        borderWidth: 0.8,
-  borderColor: "red",
-  borderRadius: 20,
-  // Android shadow
-  elevation: 6,
-shadowOpacity: 0.45,
-shadowRadius: 12,
-shadowOffset: { width: 0, height: 10 },
-             }}> 
-    <DateTimePicker
-                  value={getCurrentDate('departure')}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={onDateChange}
-                  minimumDate={new Date()}
-                />
-
-            </View>
+                <View style={{
+                  borderWidth: 0.8,
+                  borderColor: "red",
+                  borderRadius: 20,
+                  elevation: 6,
+                  shadowOpacity: 0.45,
+                  shadowRadius: 12,
+                  shadowOffset: { width: 0, height: 10 },
+                }}> 
+                  <DateTimePicker
+                    value={getCurrentDate('departure')}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={onDateChange}
+                    minimumDate={new Date()}
+                  />
+                </View>
               )}
 
               {showReturnPicker && (
                 <View style={{
-
-        borderWidth: 0.8,
-  borderColor: "red",
-  borderRadius: 20,
-  // Android shadow
-  elevation: 6,
-shadowOpacity: 0.45,
-shadowRadius: 12,
-shadowOffset: { width: 0, height: 10 },
-             }}> 
-                <DateTimePicker
-                  value={getCurrentDate('return')}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={onDateChange}
-                  minimumDate={getMinReturnDate()}
-                /> 
+                  borderWidth: 0.8,
+                  borderColor: "red",
+                  borderRadius: 20,
+                  elevation: 6,
+                  shadowOpacity: 0.45,
+                  shadowRadius: 12,
+                  shadowOffset: { width: 0, height: 10 },
+                }}> 
+                  <DateTimePicker
+                    value={getCurrentDate('return')}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={onDateChange}
+                    minimumDate={getMinReturnDate()}
+                  /> 
                 </View>
               )}
 
@@ -603,12 +643,8 @@ shadowOffset: { width: 0, height: 10 },
                 <Text style={styles.inputLabel}>Passengers</Text>
                 <View style={styles.passengerSelector}>
                   <View style={styles.passengerItem}>
-                    {/* <Image source={require('../../../assets/images/profile.png')} style={styles.passengerIcon} /> */}
                     <View style={styles.passengerTextContainer}>
                       <Text style={styles.passengerText}>{getPassengerSummary()}</Text>
-                      {/* <Text style={styles.passengerSubText}>
-                        {getTotalPassengers()} Total
-                      </Text> */}
                     </View>
                   </View>
                   <TouchableOpacity
@@ -620,7 +656,6 @@ shadowOffset: { width: 0, height: 10 },
                 </View>
               </View>
 
-              {/* Passenger Selection Modal */}
               <PassengerModal
                 visible={isPassengerModalVisible}
                 onClose={() => setIsPassengerModalVisible(false)}
@@ -628,9 +663,8 @@ shadowOffset: { width: 0, height: 10 },
                 onPassengerChange={handlePassengerChange}
               />
 
-              {/* Search Button */}
               <CustomButton
-                title={'Search Flights'}
+                title={loading ? 'Searching...' : `Search ${tripType === 'one-way' ? 'One Way' : 'Round Trip'} Flights`}
                 buttonStyle={[
                   styles.searchButton,
                   loading && styles.searchButtonDisabled
@@ -638,16 +672,15 @@ shadowOffset: { width: 0, height: 10 },
                 onPress={handleSearch}
                 disabled={loading}
               />
-
-              {/* Loading Indicator */}
-               
             </View>
 
             {/* Available Flights */}
             {flights.length > 0 && !loading && (
               <View style={styles.flightsSection}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Available Flights</Text>
+                  <Text style={styles.sectionTitle}>
+                    Available {tripType === 'one-way' ? 'One Way' : 'Round Trip'} Flights
+                  </Text>
                   <Text style={styles.resultsCount}>{flights.length} results</Text>
                 </View>
                 <FlatList
@@ -659,9 +692,10 @@ shadowOffset: { width: 0, height: 10 },
                 />
                 {flights.length > 3 && (
                   <TouchableOpacity style={styles.viewMoreButton}
-
                     onPress={() => navigation.navigate("FlightOffersScreen", {
-                      flights: flights
+                      flights: flights,
+                      tripType: tripType,
+                      searchParams: searchParams
                     })}
                   >
                     <Text style={styles.viewMoreText}>View All Flights ({flights.length})</Text>
@@ -671,50 +705,32 @@ shadowOffset: { width: 0, height: 10 },
             )}
 
             {/* Private Jets Section */}
-            <View style={styles.jetSection}>
-              {/* <View style={styles.sectionHeader}>
-                <View>
-                  <Text style={styles.sectionTitle}>Private Jets</Text>
-                  <Text style={styles.sectionSubtitle}>Luxury travel experience</Text>
-                </View>
-                <TouchableOpacity style={styles.viewAllButton}>
-                  <Text style={styles.viewAllText}>View All</Text>
-                </TouchableOpacity>
-              </View> */}
-
-              {/* {privateJets.length > 0 ? (
-                <FlatList
-                  horizontal
-                  data={privateJets}
-                  keyExtractor={(item) => item.id}
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={renderJetItem}
-                  contentContainerStyle={styles.jetList}
-                />
-              ) : (
-                <View style={styles.noDataContainer}>
-                  <Image source={imageIndex.boking} style={styles.noDataIcon} /> 
-                  <Text style={styles.noDataText}>No private jets available</Text>
-                </View>
-              )} */}
-              <View style={{
-                marginHorizontal:20
-              }}>
-              <CustomButton
-                title={'Private Jets'}
-                buttonStyle={[
-                  styles.searchButton,
-                 ]}
-                onPress={()=>{
-                  navigation.navigate("PrivateJetsScreen")
-                }}
-                disabled={loading}
-              />
+            {/* <View style={styles.jetSection}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Private Jets</Text>
+                <Text style={styles.resultsCount}>{privateJets.length} available</Text>
               </View>
-            </View>
+              <FlatList
+                data={privateJets}
+                renderItem={renderJetItem}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.jetList}
+                ListEmptyComponent={
+                  !loading && (
+                    <View style={styles.emptyState}>
+                      <Text style={styles.emptyStateText}>No private jets available</Text>
+                      <Text style={styles.emptyStateSubtext}>Search for flights to see available jets</Text>
+                    </View>
+                  )
+                }
+              />
+            </View> */}
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
+
       <AirportSearchModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
@@ -731,7 +747,3 @@ shadowOffset: { width: 0, height: 10 },
 };
 
 export default HomeScreen;
-
-
-
-

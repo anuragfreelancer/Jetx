@@ -20,11 +20,40 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
     const timer = setTimeout(() => {
       checkLogout();
       getAmadeusToken()
+      verifyApiToken()
     }, 2000);  
     return () => clearTimeout(timer);  
   }, [isFocus, navigation]);   
 
+const AVIA_PAGE_BASE_URL = 'https://api.aviapages.com';
+const API_TOKEN = 'zgkRrapzpZv3xA811rWtckMIjY6WCkmCpcmn';
 
+// API Token Verification Function
+const verifyApiToken = async () => {
+  try {
+     
+    const response = await fetch(`${AVIA_PAGE_BASE_URL}/api/v1/auth/verify`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `To ${API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    });
+      console.log('✅ API Token is valid:', response);
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ API Token is valid:', data);
+      return true;
+    } else {
+      console.log('❌ API Token verification failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Token verification error:', error);
+    return false;
+  }
+};
 const getAmadeusToken = async () => {
   try {
     const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {

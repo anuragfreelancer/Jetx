@@ -46,6 +46,43 @@ const styles = StyleSheet.create({
     height: 24,
     width: 24,
   },
+  tripTypeContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 4,
+    marginVertical: 10,
+  },
+  tripTypeButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tripTypeButtonActive: {
+    backgroundColor: 'red',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tripTypeText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666666',
+  },
+  tripTypeTextActive: {
+    color: 'white',
+    fontWeight: '600',
+        fontSize: 15,
+  },
+
   profileIcon: {
     height: 40,
     width: 40,
@@ -89,8 +126,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#1a1a1a',
-    marginBottom: 20,
-  },
+   },
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
