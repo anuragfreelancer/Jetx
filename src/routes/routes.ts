@@ -32,6 +32,7 @@ import PrivateJetScreen from "../screen/PrivateJets/PrivateJets";
  import BookingFormScreen from '../screen/PrivateFlight/BookingFormScreen';
  import PaymentScreen from '../screen/PrivateFlight/PaymentScreen';
  import ConfirmationScreen from '../screen/PrivateFlight/ConfirmationScreen';
+import CharterDetailsScreen from "../screen/home/CharterDetailsScreen.js";
  const useAuth = () => {
   return useSelector((state: any) => state?.auth);
 };
@@ -64,6 +65,7 @@ const _routes = () => {
        { name: ScreenNameEnum.SavedPreferences, Component: SavedPreferences },
        { name: ScreenNameEnum.PaymentMethods, Component: PaymentMethods },
        { name: ScreenNameEnum.Notifications, Component: Notification },
+       { name: "CharterDetailsScreen", Component: CharterDetailsScreen },
 
 
 
@@ -79,7 +81,7 @@ const _routes = () => {
             { name: "PrivateJetsScreen", Component: PrivateJetsScreen },
             { name: "JetDetail", Component: JetDetailScreen },
             { name: "BookingFormScreen", Component: BookingFormScreen },
-            { name: "PaymentScreen", Component: PaymentScreen },
+            // { name: "PaymentScreen", Component: PaymentScreen },
             { name: "ConfirmationScreen", Component: ConfirmationScreen },
 
             //  { name: "SearchFlightsScreen", Component: SearchFlightsScreen },

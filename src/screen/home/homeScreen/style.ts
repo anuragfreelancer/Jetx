@@ -53,6 +53,225 @@ const styles = StyleSheet.create({
     padding: 4,
     marginVertical: 10,
   },
+    flightCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  priceContainer: {
+    alignItems: 'flex-end',
+  },
+  priceNote: {
+    fontSize: 12,
+    color: '#94A3B8',
+    marginTop: 2,
+  },
+  aircraftInfo: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+  },
+  aircraftName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E293B',
+  },
+  seatsInfo: {
+    fontSize: 12,
+    color: '#64748B',
+    marginLeft: 4,
+  },
+  priceBreakdown: {
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  basePrice: {
+    fontSize: 12,
+    color: '#475569',
+    marginRight: 8,
+  },
+  serviceFee: {
+    fontSize: 12,
+    color: '#DC2626',
+    fontWeight: '500',
+  },
+  selectButton: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+// Time Picker Styles
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  justifyContent: 'flex-end',
+},
+timePickerModal: {
+  backgroundColor: 'white',
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  padding: 20,
+  maxHeight: '80%',
+},
+timePickerHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 20,
+},
+timePickerTitle: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#333',
+},
+closeButton: {
+  fontSize: 24,
+  color: '#666',
+  padding: 5,
+},
+selectedTimeDisplay: {
+  textAlign: 'center',
+  fontSize: 16,
+  color: '#666',
+  marginBottom: 20,
+},
+selectedTimeText: {
+  fontSize: 18,
+  fontWeight: '700',
+  color: '#FF3B30',
+},
+timeSlotsContainer: {
+  paddingBottom: 20,
+},
+timeSlot: {
+  flex: 1,
+  paddingVertical: 12,
+  paddingHorizontal: 8,
+  margin: 4,
+  borderRadius: 10,
+  backgroundColor: '#f5f5f5',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderWidth: 1,
+  borderColor: '#e0e0e0',
+},
+selectedTimeSlot: {
+  backgroundColor: '#FF3B30',
+  borderColor: '#FF3B30',
+},
+timeSlotText: {
+  fontSize: 14,
+  fontWeight: '500',
+  color: '#333',
+},
+selectedTimeSlotText: {
+  color: 'white',
+  fontWeight: '700',
+},
+timePickerButtons: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginTop: 10,
+  paddingTop: 20,
+  borderTopWidth: 1,
+  borderTopColor: '#e0e0e0',
+},
+timePickerButton: {
+  flex: 1,
+  paddingVertical: 15,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginHorizontal: 5,
+},
+cancelButton: {
+  backgroundColor: '#f5f5f5',
+},
+confirmButton: {
+  backgroundColor: '#FF3B30',
+},
+cancelButtonText: {
+  color: '#666',
+  fontSize: 16,
+  fontWeight: '600',
+},
+confirmButtonText: {
+  color: 'white',
+  fontSize: 16,
+  fontWeight: '600',
+},
+
+// Date and Time Container Styles
+dateTimeContainer: {
+  marginTop: 20,
+},
+dateTimeRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: 15,
+},
+dateTimeInput: {
+  flex: 0.48,
+},
+dateTimeButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: 'white',
+  borderWidth: 1,
+  borderColor: '#f27171ff',
+  borderRadius: 10,
+  paddingVertical: 12,
+  paddingHorizontal: 15,
+  marginTop: 5,
+ },
+dateTimeText: {
+  fontSize: 16,
+  color: '#333',
+   flex: 1,
+      textAlign:"center"
+
+},
+timeIcon: {
+  width: 18,
+  height: 18,
+ },
+datePickerContainer: {
+  backgroundColor: 'white',
+  borderRadius: 10,
+  elevation: 5,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  marginTop: 10,
+  marginBottom: 15,
+},
+
+// Flight Card Time Badge
+preferredTimeBadge: {
+  fontSize: 10,
+  color: '#FF3B30',
+  fontWeight: '600',
+  marginTop: 2,
+  backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    borderRadius: 4,
+  alignSelf: 'flex-start',
+  padding:2, 
+  marginBottom:5
+},
+
+// Flight Time Info
+flightTimeInfo: {
+  fontSize: 14,
+  color: '#666',
+  marginTop: 2,
+},
   tripTypeButton: {
     flex: 1,
     paddingVertical: 12,
@@ -139,7 +358,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#666',
-    marginBottom: 8,
+    marginBottom: 8, 
   },
   inputWithIcon: {
     flexDirection: 'row',
@@ -198,9 +417,7 @@ const styles = StyleSheet.create({
   dateIcon: {
     height: 20,
     width: 20,
-    marginRight: 12,
-    tintColor: '#666',
-  },
+    },
   dateText: {
     fontSize: 14,
     fontWeight: '500',

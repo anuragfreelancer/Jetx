@@ -12,12 +12,14 @@ import {
   Platform
 } from 'react-native';
 import { makeBooking } from '../../Aviapages/api';
- import CustomHeader from '../../compoent/CustomHeader' ;
- import imageIndex from '../../assets/imageIndex'
+import CustomHeader from '../../compoent/CustomHeader';
+import imageIndex from '../../assets/imageIndex';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 const RED_THEME = {
   primary: '#FF3B30',
-  primaryDark: '#FF3B30',
-  primaryLight: '#EF4444',
+  primaryDark: '#D32F2F',
+  primaryLight: '#FFCDD2',
   secondary: '#FF3B30',
   background: '#FEF2F2',
   card: '#FFFFFF',
@@ -30,7 +32,7 @@ const RED_THEME = {
 };
 
 const BookingFormScreen = ({ route, navigation }) => {
-  const { jet } = route.params;
+  const { jet } = route?.params || {};
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -70,7 +72,11 @@ const BookingFormScreen = ({ route, navigation }) => {
       return false;
     }
     if (!bookingData.passengers_count || parseInt(bookingData.passengers_count) < 1) {
-      Alert.alert('Error', 'Please enter number of passengers');
+      Alert.alert('Error', 'Please enter valid number of passengers (minimum 1)');
+      return false;
+    }
+    if (jet && parseInt(bookingData.passengers_count) > jet.passengers_max) {
+      Alert.alert('Error', `Maximum ${jet.passengers_max} passengers allowed for this aircraft`);
       return false;
     }
     return true;
@@ -81,6 +87,12 @@ const BookingFormScreen = ({ route, navigation }) => {
       Alert.alert('Error', 'Please select departure date');
       return false;
     }
+    // Validate date format YYYY-MM-DD
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(bookingData.departure_date)) {
+      Alert.alert('Error', 'Please enter departure date in YYYY-MM-DD format');
+      return false;
+    }
     if (!bookingData.origin.trim()) {
       Alert.alert('Error', 'Please enter origin airport');
       return false;
@@ -89,9 +101,19 @@ const BookingFormScreen = ({ route, navigation }) => {
       Alert.alert('Error', 'Please enter destination airport');
       return false;
     }
-    if (bookingData.trip_type === 'round_trip' && !bookingData.return_date.trim()) {
-      Alert.alert('Error', 'Please select return date for round trip');
-      return false;
+    if (bookingData.trip_type === 'round_trip') {
+      if (!bookingData.return_date.trim()) {
+        Alert.alert('Error', 'Please select return date for round trip');
+        return false;
+      }
+      if (!dateRegex.test(bookingData.return_date)) {
+        Alert.alert('Error', 'Please enter return date in YYYY-MM-DD format');
+        return false;
+      }
+      if (bookingData.return_date <= bookingData.departure_date) {
+        Alert.alert('Error', 'Return date must be after departure date');
+        return false;
+      }
     }
     return true;
   };
@@ -99,14 +121,23 @@ const BookingFormScreen = ({ route, navigation }) => {
   const nextStep = () => {
     if (currentStep === 1 && !validateStep1()) return;
     if (currentStep === 2 && !validateStep2()) return;
-    setCurrentStep(currentStep + 1);
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const prevStep = () => {
-    setCurrentStep(currentStep - 1);
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   const handleSubmit = async () => {
+    if (!jet || !jet.id) {
+      Alert.alert('Error', 'Aircraft information is missing');
+      return;
+    }
+
     setLoading(true);
     try {
       const bookingPayload = {
@@ -126,14 +157,18 @@ const BookingFormScreen = ({ route, navigation }) => {
 
       const result = await makeBooking(bookingPayload);
       
-      // Navigate to payment screen
-      navigation.navigate('PaymentScreen', {
-        bookingData: bookingPayload,
-        bookingResult: result,
-        jet: jet
-      });
+      if (result.success) {
+        // Navigate to payment screen
+        navigation.navigate('PaymentScreen', {
+          bookingData: bookingPayload,
+          bookingResult: result,
+          jet: jet
+        });
+      } else {
+        Alert.alert('Booking Failed', result.message || 'Failed to create booking');
+      }
     } catch (error) {
-      Alert.alert('Booking Failed', error.message);
+      Alert.alert('Booking Failed', error.message || 'An error occurred while booking');
     } finally {
       setLoading(false);
     }
@@ -142,29 +177,33 @@ const BookingFormScreen = ({ route, navigation }) => {
   const renderStepIndicator = () => (
     <View style={styles.stepsContainer}>
       {[1, 2, 3].map((step) => (
-        <View key={step} style={styles.stepContainer}>
-          <View style={[
-            styles.stepCircle,
-            currentStep >= step && styles.stepCircleActive
-          ]}>
+        <React.Fragment key={step}>
+          <View style={styles.stepItem}>
+            <View style={[
+              styles.stepCircle,
+              currentStep >= step && styles.stepCircleActive
+            ]}>
+              <Text style={[
+                styles.stepText,
+                currentStep >= step && styles.stepTextActive
+              ]}>
+                {step}
+              </Text>
+            </View>
             <Text style={[
-              styles.stepText,
-              currentStep >= step && styles.stepTextActive
-            ]}>{step}</Text>
+              styles.stepLabel,
+              currentStep >= step && styles.stepLabelActive
+            ]}>
+              {step === 1 ? 'Passenger' : step === 2 ? 'Flight' : 'Review'}
+            </Text>
           </View>
-          <Text style={[
-            styles.stepLabel,
-            currentStep >= step && styles.stepLabelActive  ,{
-                marginLeft:2
-            }
-          ]}>
-            {step === 1 ? 'Passenger' : step === 2 ? 'Flight' : 'Review'}
-          </Text>
-          {step < 3 && <View style={[
-            styles.stepLine,
-            currentStep > step && styles.stepLineActive
-          ]} />}
-        </View>
+          {step < 3 && (
+            <View style={[
+              styles.stepLine,
+              currentStep > step && styles.stepLineActive
+            ]} />
+          )}
+        </React.Fragment>
       ))}
     </View>
   );
@@ -181,6 +220,7 @@ const BookingFormScreen = ({ route, navigation }) => {
           onChangeText={(text) => setBookingData(prev => ({...prev, passenger_name: text}))}
           placeholder="Enter your full name"
           placeholderTextColor="#999"
+          autoComplete="name"
         />
       </View>
 
@@ -216,12 +256,22 @@ const BookingFormScreen = ({ route, navigation }) => {
         <TextInput
           style={styles.textInput}
           value={bookingData.passengers_count}
-          onChangeText={(text) => setBookingData(prev => ({...prev, passengers_count: text.replace(/[^0-9]/g, '')}))}
+          onChangeText={(text) => {
+            const numericValue = text.replace(/[^0-9]/g, '');
+            if (numericValue === '' || parseInt(numericValue) > 0) {
+              setBookingData(prev => ({...prev, passengers_count: numericValue}));
+            }
+          }}
           placeholder="1"
           placeholderTextColor="#999"
           keyboardType="numeric"
           maxLength={2}
         />
+        {jet && (
+          <Text style={styles.hintText}>
+            Maximum capacity: {jet.passengers_max} passengers
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -239,11 +289,14 @@ const BookingFormScreen = ({ route, navigation }) => {
               bookingData.trip_type === 'one_way' && styles.radioButtonSelected
             ]}
             onPress={() => setBookingData(prev => ({...prev, trip_type: 'one_way', return_date: ''}))}
+            activeOpacity={0.7}
           >
             <Text style={[
               styles.radioText,
               bookingData.trip_type === 'one_way' && styles.radioTextSelected
-            ]}>One Way</Text>
+            ]}>
+              One Way
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[
@@ -251,11 +304,14 @@ const BookingFormScreen = ({ route, navigation }) => {
               bookingData.trip_type === 'round_trip' && styles.radioButtonSelected
             ]}
             onPress={() => setBookingData(prev => ({...prev, trip_type: 'round_trip'}))}
+            activeOpacity={0.7}
           >
             <Text style={[
               styles.radioText,
               bookingData.trip_type === 'round_trip' && styles.radioTextSelected
-            ]}>Round Trip</Text>
+            ]}>
+              Round Trip
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -269,6 +325,7 @@ const BookingFormScreen = ({ route, navigation }) => {
           placeholder="YYYY-MM-DD"
           placeholderTextColor="#999"
         />
+        <Text style={styles.hintText}>Format: YYYY-MM-DD</Text>
       </View>
 
       {bookingData.trip_type === 'round_trip' && (
@@ -281,6 +338,7 @@ const BookingFormScreen = ({ route, navigation }) => {
             placeholder="YYYY-MM-DD"
             placeholderTextColor="#999"
           />
+          <Text style={styles.hintText}>Format: YYYY-MM-DD</Text>
         </View>
       )}
 
@@ -321,15 +379,17 @@ const BookingFormScreen = ({ route, navigation }) => {
           <Text style={styles.summarySectionTitle}>Aircraft</Text>
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>Registration:</Text>
-            <Text style={styles.summaryValue}>{jet.registration_number}</Text>
+            <Text style={styles.summaryValue}>{jet?.registration_number || 'N/A'}</Text>
           </View>
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>Model:</Text>
-            <Text style={styles.summaryValue}>{jet.manufacturer?.name} {jet.model?.name}</Text>
+            <Text style={styles.summaryValue}>
+              {jet?.manufacturer?.name || ''} {jet?.model?.name || ''}
+            </Text>
           </View>
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>Max Passengers:</Text>
-            <Text style={styles.summaryValue}>{jet.passengers_max}</Text>
+            <Text style={styles.summaryValue}>{jet?.passengers_max || 'N/A'}</Text>
           </View>
         </View>
 
@@ -379,43 +439,44 @@ const BookingFormScreen = ({ route, navigation }) => {
           )}
         </View>
 
-        {bookingData.special_requests && (
-          <View style={styles.summarySection}>
-            <Text style={styles.summarySectionTitle}>Special Requests</Text>
-            <Text style={styles.specialRequests}>{bookingData.special_requests}</Text>
-          </View>
-        )}
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>Special Requests (Optional)</Text>
-        <TextInput
-          style={[styles.textInput, styles.textArea]}
-          value={bookingData.special_requests}
-          onChangeText={(text) => setBookingData(prev => ({...prev, special_requests: text}))}
-          placeholder="Any special requirements or requests..."
-          placeholderTextColor="#999"
-          multiline
-          numberOfLines={4}
-          textAlignVertical="top"
-        />
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Special Requests (Optional)</Text>
+          <TextInput
+            style={[styles.textInput, styles.textArea]}
+            value={bookingData.special_requests}
+            onChangeText={(text) => setBookingData(prev => ({...prev, special_requests: text}))}
+            placeholder="Any special requirements or requests..."
+            placeholderTextColor="#999"
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+        </View>
       </View>
     </View>
   );
 
   return (
+    <SafeAreaView style={{
+      flex:1
+    }}> 
     <KeyboardAvoidingView 
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-              <CustomHeader imageSource={imageIndex.backorange} label="Boking From" />
-
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <CustomHeader imageSource={imageIndex.backorange} label="Booking Form" />
+        
         {/* Selected Jet Info */}
         <View style={styles.jetInfo}>
           <Text style={styles.jetInfoTitle}>Selected Aircraft</Text>
           <Text style={styles.jetInfoText}>
-            {jet.registration_number} - {jet.manufacturer?.name} {jet.model?.name}
+            {jet?.registration_number || 'N/A'} - {jet?.manufacturer?.name || ''} {jet?.model?.name || ''}
           </Text>
         </View>
 
@@ -426,46 +487,50 @@ const BookingFormScreen = ({ route, navigation }) => {
         {currentStep === 1 && renderStep1()}
         {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
-
-        {/* Navigation Buttons */}
-        <View style={styles.navigationButtons}>
-          {currentStep > 1 && (
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={prevStep}
-              disabled={loading}
-            >
-              <Text style={styles.backButtonText}>Back</Text>
-            </TouchableOpacity>
-          )}
-          
-          {currentStep < 3 ? (
-            <TouchableOpacity 
-              style={styles.nextButton}
-              onPress={nextStep}
-              disabled={loading}
-            >
-              <Text style={styles.nextButtonText}>Next</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity 
-              style={[
-                styles.submitButton,
-                loading && styles.submitButtonDisabled
-              ]}
-              onPress={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <Text style={styles.submitButtonText}>Proceed to Payment</Text>
-              )}
-            </TouchableOpacity>
-          )}
-        </View>
       </ScrollView>
+
+      {/* Navigation Buttons - Fixed at bottom */}
+      <View style={styles.navigationButtons}>
+        {currentStep > 1 && (
+          <TouchableOpacity 
+            style={[styles.backButton, loading && styles.buttonDisabled]}
+            onPress={prevStep}
+            disabled={loading}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+        )}
+        
+        {currentStep < 3 ? (
+          <TouchableOpacity 
+            style={[styles.nextButton, loading && styles.buttonDisabled]}
+            onPress={nextStep}
+            disabled={loading}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity 
+            style={[
+              styles.submitButton,
+              loading && styles.buttonDisabled
+            ]}
+            onPress={handleSubmit}
+            disabled={loading}
+            activeOpacity={0.7}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.submitButtonText}>Proceed to Payment</Text>
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -473,10 +538,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: RED_THEME.background,
+    marginTop:20
   },
   scrollView: {
     flex: 1,
-    marginTop:40
+  },
+  scrollContent: {
+    paddingBottom: 100, // Space for fixed buttons
   },
   jetInfo: {
     backgroundColor: '#FFFFFF',
@@ -504,8 +572,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: RED_THEME.border,
   },
-  stepContainer: {
-    flexDirection: 'row',
+  stepItem: {
     alignItems: 'center',
   },
   stepCircle: {
@@ -535,6 +602,7 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     marginTop: 4,
     textAlign: 'center',
+    minWidth: 60,
   },
   stepLabelActive: {
     color: RED_THEME.primary,
@@ -582,6 +650,12 @@ const styles = StyleSheet.create({
   textArea: {
     height: 100,
     textAlignVertical: 'top',
+  },
+  hintText: {
+    fontSize: 12,
+    color: RED_THEME.textLight,
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   radioGroup: {
     flexDirection: 'row',
@@ -649,18 +723,20 @@ const styles = StyleSheet.create({
     color: RED_THEME.text,
     fontWeight: '600',
     textAlign: 'right',
-  },
-  specialRequests: {
-    fontSize: 14,
-    color: RED_THEME.text,
-    lineHeight: 20,
-    fontStyle: 'italic',
+    flexShrink: 1,
+    marginLeft: 10,
   },
   navigationButtons: {
     flexDirection: 'row',
     padding: 20,
     backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: RED_THEME.border,
     gap: 12,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   backButton: {
     flex: 1,
@@ -698,9 +774,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  submitButtonDisabled: {
+  buttonDisabled: {
     backgroundColor: '#9CA3AF',
     shadowOpacity: 0,
+    elevation: 0,
   },
   submitButtonText: {
     color: '#FFFFFF',
