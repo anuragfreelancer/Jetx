@@ -53,12 +53,12 @@ export default function SignUp() {
 
             <Image
               source={imageIndex.appLogo}
-              style={{ height: 57, width: 176 }} resizeMode='contain'
+              style={{ height: 70, width: 200 }} resizeMode='contain'
             />
           </View>
           <View style={{ marginTop: 22, alignItems: "center" }}>
             <Text style={styles.txtHeading}>
-              Welcome Back to <Text style={{ color: '#FF3B30' }}>Jetx</Text>
+              Welcome Back to <Text style={{ color: '#FF3B30' }}>Brayh</Text>
             </Text>
 
           </View>
