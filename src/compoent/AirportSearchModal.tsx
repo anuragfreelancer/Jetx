@@ -728,7 +728,7 @@ import {
     StyleSheet,
     ActivityIndicator,
 } from 'react-native';
-import { AviapagesFlightService } from '../screen/home/AviapagesFlightService';
+import { searchAirports as searchAirportsAPI } from '../Aviapages/api';
  
 const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -736,38 +736,43 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
     const [loading, setLoading] = useState(false);
     const [debouncedQuery, setDebouncedQuery] = useState('');
 
-    // Popular airports as fallback
+    // Popular airports as fallback (with ICAO codes for AviaPages API)
     const popularAirports = [
         // North America
-        { id: 'JFK', displayName: 'John F Kennedy International Airport (JFK)', iataCode: 'JFK', city: 'New York', country: 'United States', subType: 'AIRPORT' },
-        { id: 'LAX', displayName: 'Los Angeles International Airport (LAX)', iataCode: 'LAX', city: 'Los Angeles', country: 'United States', subType: 'AIRPORT' },
-        { id: 'ORD', displayName: "Chicago O'Hare International Airport (ORD)", iataCode: 'ORD', city: 'Chicago', country: 'United States', subType: 'AIRPORT' },
-        { id: 'YYZ', displayName: 'Toronto Pearson International Airport (YYZ)', iataCode: 'YYZ', city: 'Toronto', country: 'Canada', subType: 'AIRPORT' },
+        { id: 'JFK', displayName: 'John F Kennedy International Airport (JFK)', iataCode: 'JFK', icaoCode: 'KJFK', city: 'New York', country: 'United States', subType: 'AIRPORT' },
+        { id: 'LAX', displayName: 'Los Angeles International Airport (LAX)', iataCode: 'LAX', icaoCode: 'KLAX', city: 'Los Angeles', country: 'United States', subType: 'AIRPORT' },
+        { id: 'ORD', displayName: "Chicago O'Hare International Airport (ORD)", iataCode: 'ORD', icaoCode: 'KORD', city: 'Chicago', country: 'United States', subType: 'AIRPORT' },
+        { id: 'YYZ', displayName: 'Toronto Pearson International Airport (YYZ)', iataCode: 'YYZ', icaoCode: 'CYYZ', city: 'Toronto', country: 'Canada', subType: 'AIRPORT' },
         
         // Middle East
-        { id: 'DXB', displayName: 'Dubai International Airport (DXB)', iataCode: 'DXB', city: 'Dubai', country: 'United Arab Emirates', subType: 'AIRPORT' },
-        { id: 'AUH', displayName: 'Abu Dhabi International Airport (AUH)', iataCode: 'AUH', city: 'Abu Dhabi', country: 'United Arab Emirates', subType: 'AIRPORT' },
-        { id: 'DOH', displayName: 'Hamad International Airport (DOH)', iataCode: 'DOH', city: 'Doha', country: 'Qatar', subType: 'AIRPORT' },
-        { id: 'RUH', displayName: 'King Khalid International Airport (RUH)', iataCode: 'RUH', city: 'Riyadh', country: 'Saudi Arabia', subType: 'AIRPORT' },
+        { id: 'DXB', displayName: 'Dubai International Airport (DXB)', iataCode: 'DXB', icaoCode: 'OMDB', city: 'Dubai', country: 'United Arab Emirates', subType: 'AIRPORT' },
+        { id: 'AUH', displayName: 'Abu Dhabi International Airport (AUH)', iataCode: 'AUH', icaoCode: 'OMAA', city: 'Abu Dhabi', country: 'United Arab Emirates', subType: 'AIRPORT' },
+        { id: 'DOH', displayName: 'Hamad International Airport (DOH)', iataCode: 'DOH', icaoCode: 'OTHH', city: 'Doha', country: 'Qatar', subType: 'AIRPORT' },
+        { id: 'RUH', displayName: 'King Khalid International Airport (RUH)', iataCode: 'RUH', icaoCode: 'OERK', city: 'Riyadh', country: 'Saudi Arabia', subType: 'AIRPORT' },
+        { id: 'JED', displayName: 'King Abdulaziz International Airport (JED)', iataCode: 'JED', icaoCode: 'OEJN', city: 'Jeddah', country: 'Saudi Arabia', subType: 'AIRPORT' },
         
         // Europe
-        { id: 'LHR', displayName: 'Heathrow Airport (LHR)', iataCode: 'LHR', city: 'London', country: 'United Kingdom', subType: 'AIRPORT' },
-        { id: 'CDG', displayName: 'Charles de Gaulle Airport (CDG)', iataCode: 'CDG', city: 'Paris', country: 'France', subType: 'AIRPORT' },
-        { id: 'FRA', displayName: 'Frankfurt Airport (FRA)', iataCode: 'FRA', city: 'Frankfurt', country: 'Germany', subType: 'AIRPORT' },
-        { id: 'AMS', displayName: 'Amsterdam Schiphol Airport (AMS)', iataCode: 'AMS', city: 'Amsterdam', country: 'Netherlands', subType: 'AIRPORT' },
+        { id: 'LHR', displayName: 'Heathrow Airport (LHR)', iataCode: 'LHR', icaoCode: 'EGLL', city: 'London', country: 'United Kingdom', subType: 'AIRPORT' },
+        { id: 'CDG', displayName: 'Charles de Gaulle Airport (CDG)', iataCode: 'CDG', icaoCode: 'LFPG', city: 'Paris', country: 'France', subType: 'AIRPORT' },
+        { id: 'FRA', displayName: 'Frankfurt Airport (FRA)', iataCode: 'FRA', icaoCode: 'EDDF', city: 'Frankfurt', country: 'Germany', subType: 'AIRPORT' },
+        { id: 'AMS', displayName: 'Amsterdam Schiphol Airport (AMS)', iataCode: 'AMS', icaoCode: 'EHAM', city: 'Amsterdam', country: 'Netherlands', subType: 'AIRPORT' },
+        { id: 'FCO', displayName: 'Rome Fiumicino Airport (FCO)', iataCode: 'FCO', icaoCode: 'LIRF', city: 'Rome', country: 'Italy', subType: 'AIRPORT' },
+        { id: 'MAD', displayName: 'Madrid Barajas Airport (MAD)', iataCode: 'MAD', icaoCode: 'LEMD', city: 'Madrid', country: 'Spain', subType: 'AIRPORT' },
         
         // Asia
-        { id: 'DEL', displayName: 'Indira Gandhi International Airport (DEL)', iataCode: 'DEL', city: 'Delhi', country: 'India', subType: 'AIRPORT' },
-        { id: 'BOM', displayName: 'Chhatrapati Shivaji Maharaj International Airport (BOM)', iataCode: 'BOM', city: 'Mumbai', country: 'India', subType: 'AIRPORT' },
-        { id: 'SIN', displayName: 'Changi Airport (SIN)', iataCode: 'SIN', city: 'Singapore', country: 'Singapore', subType: 'AIRPORT' },
-        { id: 'BKK', displayName: 'Suvarnabhumi Airport (BKK)', iataCode: 'BKK', city: 'Bangkok', country: 'Thailand', subType: 'AIRPORT' },
+        { id: 'DEL', displayName: 'Indira Gandhi International Airport (DEL)', iataCode: 'DEL', icaoCode: 'VIDP', city: 'Delhi', country: 'India', subType: 'AIRPORT' },
+        { id: 'BOM', displayName: 'Chhatrapati Shivaji Maharaj International Airport (BOM)', iataCode: 'BOM', icaoCode: 'VABB', city: 'Mumbai', country: 'India', subType: 'AIRPORT' },
+        { id: 'SIN', displayName: 'Changi Airport (SIN)', iataCode: 'SIN', icaoCode: 'WSSS', city: 'Singapore', country: 'Singapore', subType: 'AIRPORT' },
+        { id: 'BKK', displayName: 'Suvarnabhumi Airport (BKK)', iataCode: 'BKK', icaoCode: 'VTBS', city: 'Bangkok', country: 'Thailand', subType: 'AIRPORT' },
+        { id: 'HKG', displayName: 'Hong Kong International Airport (HKG)', iataCode: 'HKG', icaoCode: 'VHHH', city: 'Hong Kong', country: 'China', subType: 'AIRPORT' },
+        { id: 'NRT', displayName: 'Narita International Airport (NRT)', iataCode: 'NRT', icaoCode: 'RJAA', city: 'Tokyo', country: 'Japan', subType: 'AIRPORT' },
     ];
 
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedQuery(searchQuery);
-        }, 600);
+        }, 400); // Reduced debounce time for better responsiveness
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
@@ -784,17 +789,42 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
         try {
             setLoading(true);
             
-            // Use Aviapages service for airport search
-            const data = await AviapagesFlightService.searchAirports(query);
+            console.log('🔍 Searching airports from REAL API for:', query);
             
-            if (data && data.data && data.data.length > 0) {
-                setAirports(data.data);
+            // Use REAL Aviapages API for airport search (v3/airports/)
+            const response = await searchAirportsAPI(query);
+            
+            console.log('📥 Airport API Response:', response?.results?.length || response?.length || 0, 'airports found');
+            
+            // Handle paginated response (results array) or direct array
+            const airportResults = response?.results || response || [];
+            
+            if (airportResults && airportResults.length > 0) {
+                // Transform API response to our format
+                const formattedAirports = airportResults.map((airport: any) => ({
+                    id: airport.id || airport.icao || airport.iata,
+                    displayName: `${airport.name} (${airport.iata || airport.icao})`,
+                    name: airport.name,
+                    iataCode: airport.iata || '',
+                    icaoCode: airport.icao || '',
+                    city: airport.city_name || airport.city || '',
+                    country: airport.country_name || airport.country || '',
+                    subType: 'AIRPORT',
+                    // Additional info from API
+                    latitude: airport.latitude,
+                    longitude: airport.longitude,
+                    timezone: airport.timezone,
+                }));
+                
+                console.log('✅ Formatted', formattedAirports.length, 'airports from API');
+                setAirports(formattedAirports);
             } else {
+                console.log('⚠️ No airports from API, using fallback');
                 // If no results from API, use fallback
                 useFallbackData(query);
             }
         } catch (error) {
-            console.error('Error searching airports with Aviapages:', error);
+            console.error('❌ Error searching airports with Aviapages API:', error);
             // On error, use fallback data
             useFallbackData(query);
         } finally {
@@ -806,18 +836,31 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
         const filteredAirports = popularAirports.filter(airport => 
             airport.city.toLowerCase().includes(query.toLowerCase()) ||
             airport.iataCode.toLowerCase().includes(query.toLowerCase()) ||
+            airport.icaoCode.toLowerCase().includes(query.toLowerCase()) ||
             airport.displayName.toLowerCase().includes(query.toLowerCase()) ||
             airport.country.toLowerCase().includes(query.toLowerCase())
         );
         
-        console.log("Fallback results:", filteredAirports.length);
+        console.log("📋 Fallback results:", filteredAirports.length);
         setAirports(filteredAirports);
     };
 
     const handleSelectAirport = (airport) => {
+        // Use ICAO code for AviaPages API, fallback to IATA if not available
+        const airportCode = airport.icaoCode || airport.icao || airport.iataCode || '';
+        
+        console.log('✈️ Selected Airport:', {
+            name: airport.displayName || airport.name,
+            iata: airport.iataCode,
+            icao: airport.icaoCode || airport.icao,
+            code: airportCode,
+        });
+        
         onSelectAirport({
             name: airport.displayName || airport.name || 'Unknown',
-            code: airport.iataCode || '',
+            code: airportCode,  // ICAO code for API
+            iataCode: airport.iataCode || '',
+            icaoCode: airport.icaoCode || airport.icao || '',
             city: airport.city || '',
             country: airport.country || '',
         });

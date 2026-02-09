@@ -1,294 +1,170 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
-  SafeAreaView,
-  StatusBar,
-} from 'react-native';
-import StatusBarComponent from '../../../../compoent/StatusBarCompoent';
-import CustomHeader from '../../../../compoent/CustomHeader';
-import imageIndex from '../../../../assets/imageIndex';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+  ActivityIndicator,
+} from "react-native";
+import { GetBookingsByUserApi } from "../../../../redux/Api/AuthApi";
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomHeader from "../../../../compoent/CustomHeader";
+import imageIndex from "../../../../assets/imageIndex";
+import { useSelector } from "react-redux";
+ 
+const MyBookingsScreen = ({ featureState, route }) => {
+  const params = route?.params;
+  const userData = featureState?.userGetData;
+  const userId = String(userData?.id ?? params?.user_id  );
+  const userGet = useSelector((state: any) => state.feature);
+ 
+  const [loading, setLoading] = useState(false);
+  const [bookingList, setBookingList] = useState([]);
 
-const BookingHistoryScreen = () => {
-  const [activeTab, setActiveTab] = useState('Upcoming');
+  useEffect(() => {
+    fetchBookings();
+  }, [])
+ 
+  const fetchBookings = async () => {
+    const data = await GetBookingsByUserApi(userGet.userGetData?.id, setLoading);
 
-  useEffect(()=>{
-    getUserBookings()
-  },[])
+    console.log("Booking List =>", data);
+    setBookingList(data);
+  };
 
-  // singel bokking id
-const getUserBookings = async () => {
-  try {
-    const token = await AsyncStorage.getItem("AMADEUS_TOKEN");
-      const { access_token } = JSON.parse(token);
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.card}>
+        {/* Top Row */}
+        <View style={styles.rowBetween}>
+          <Text style={styles.flightName}>✈️ {item.flight_name}</Text>
+          <Text style={styles.amount}>₹ {item.total_amount}</Text>
+        </View>
 
+        {/* Route */}
+        <Text style={styles.route}>
+          {item.source_airport_name} ➝ {item.destination_airport_name}
+        </Text>
 
-    const flightOrderId = "eJzTd9c3D_EOCgsFAAtCAnk"; // dynamic later
+        {/* Info */}
+        <Text style={styles.text}>Journey Date: {item.journey_date}</Text>
+        <Text style={styles.text}>Passengers: {item.total_passengers}</Text>
+        <Text style={styles.text}>Booked On: {item.created_at}</Text>
 
-    const response = await fetch(
-      `https://test.api.amadeus.com/v1/booking/flight-orders/${flightOrderId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-          "Content-Type": "application/json",
-        },
-      }
+        {/* Status */}
+        <View style={styles.statusRow}>
+          <View style={[styles.badge, styles.pending]}>
+            <Text style={styles.badgeText}>{item.booking_status}</Text>
+          </View>
+          <View style={[styles.badge, styles.payment]}>
+            <Text style={styles.badgeText}>{item.payment_status}</Text>
+          </View>
+        </View>
+      </View>
     );
-
-    const result = await response.json();
-
-    console.log("📥 Bookings Response:", result);
-
-    if (!response.ok) {
-      const errorMsg =
-        result?.errors?.[0]?.detail ||
-        result?.errors?.[0]?.title ||
-        "Unable to fetch bookings";
-
-      throw new Error(errorMsg);
-    }
-
-    return result;
-  } catch (err) {
-    console.log("❌ Bookings Fetch Error:", err.message);
-    return { success: false, message: err.message };
-  }
-};
-
-
-
-
-
-
-
-
-
-// all boking lies user 
-
-// const getUserBookings = async () => {
-//   try {
-//     const userId = await AsyncStorage.getItem("USER_ID");
-
-//     const res = await fetch(
-//       `https://yourbackend.com/bookings?userId=${userId}`
-//     );
-
-//     const result = await res.json();
-
-//     console.log("📥 My Booking List:", result);
-
-//     if (!result.success) {
-//       throw new Error(result.message || "Unable to load bookings");
-//     }
-
-//     return result.bookings;
-//   } catch (error) {
-//     console.log("❌ Booking List Error:", error.message);
-//     return [];
-//   }
-// };
-
-
-  const bookings = [
-    {
-      id: '1',
-      from: 'LAX',
-      to: 'JFK',
-      date: 'April 10, 2025',
-      jet: 'Jet Gulfstream G700',
-      price: '$90,000',
-    },
-    {
-      id: '2',
-      from: 'MIA',
-      to: 'LON',
-      date: 'May 6, 2026',
-      jet: 'Jet Bombardier Global 7500',
-      price: '$120,000',
-    },
-    {
-      id: '3',
-      from: 'NYC',
-      to: 'DXB',
-      date: 'Mar 15, 2024',
-      jet: 'Jet Dassault Falcon 10X',
-      price: '$85,000',
-    },
-    {
-      id: '4',
-      from: 'LAX',
-      to: 'JFK',
-      date: 'April 10, 2025',
-      jet: 'Jet Gulfstream G700',
-      price: '$90,000',
-    },
-    {
-      id: '5',
-      from: 'MIA',
-      to: 'LON',
-      date: 'April 10, 2025',
-      jet: 'Jet Gulfstream G700',
-      price: '$90,000',
-    },
-  ];
-
-  const renderCard = ({ item }) => (
-    <View style={styles.card}>
-        <View style={{flexDirection:"row",justifyContent:"space-between", }}>
-        <View style={{flexDirection:"column"}}>
-      <Text style={styles.route}>{item.from} – {item.to}</Text>
-      <Text style={styles.info}>{item.date}</Text>
-      <Text style={styles.info}>{item.jet}</Text>
-      <Text style={styles.info}>Paid {item.price}</Text>
-      </View>
-      <TouchableOpacity style={styles.detailsButton}>
-        <Text style={styles.detailsButtonText}>View Details</Text>
-      </TouchableOpacity>
-      </View>
-    </View>
-  );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-       <StatusBarComponent/>
-       <CustomHeader imageSource={imageIndex.backorange} label="Booking History" />
+       <CustomHeader label="My Bookings" imageSource={imageIndex.backorange} />
 
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'Upcoming' && styles.activeTab]}
-          onPress={() => setActiveTab('Upcoming')}
-        >
-          <Text style={[styles.tabText, activeTab === 'Upcoming' && styles.activeTabText]}>
-            Upcoming Flights
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'Past' && styles.activeTab]}
-          onPress={() => setActiveTab('Past')}
-        >
-          <Text style={[styles.tabText, activeTab === 'Past' && styles.activeTabText]}>
-            Past Flights
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* List */}
-      <FlatList
-        data={bookings}
-        style={{
-            marginTop:15,
-            marginHorizontal:18
-        }}
-        keyExtractor={(item) => item.id}
-        renderItem={renderCard}
-        contentContainerStyle={{ paddingBottom: 20 }}
+      {loading ? (
+        <ActivityIndicator size="large" color="#eb2525ff" />
+      ) : (
+        <FlatList 
         showsVerticalScrollIndicator={false}
-      />
+          data={bookingList}
+          style={{
+            marginTop:16
+          }}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No bookings found</Text>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 };
 
+export default MyBookingsScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-   },
-  header: {
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    backgroundColor: "white",
+    padding: 16,
   },
-  backArrow: {
-    fontSize: 24,
-    color: '#000',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
- 
-  
-    },
-  tabButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    width:"45%",
-   },
-  activeTab: {
-    borderBottomColor: '#FF3B30',
-  
-  },
-  tabText: {
-    fontSize: 14,
-    color: '#352C48',
-    textAlign:"center",
-    fontWeight:"700"
-  },
-  activeTabText: {
-     fontSize: 14,
-    color: '#FF3B30',
-    textAlign:"center",
-    fontWeight:"700",
- 
+  heading: {
+    fontSize: 22,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 12,
+    color: "#1E3A8A",
   },
   card: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 12,
-    elevation: 2, // Android
-    marginVertical: 2,
-    marginHorizontal: 1,
-    
-    // iOS Shadow
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    
-   },
-  route: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 5,
+    elevation: 3,
+    borderWidth:1 ,
+    borderColor:"#E5E7EB"
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  flightName: {
     fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 6,
-    color:"#000000"
+    fontWeight: "700",
+    color: "#1E40AF",
   },
-  info: {
-    fontSize: 12,
-    color: '#878787',
-    marginBottom: 2,
-    fontWeight:"500"
+  amount: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#16A34A",
   },
-  detailsButton: {
-    alignSelf: 'flex-end',
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#FF3B30',
-    bottom:24
-   },
-  detailsButtonText: {
-    color: '#FF3B30',
-    fontWeight: '600',
+  route: {
+    fontSize: 14,
+    color: "#333",
+    marginTop: 6,
+  },
+  text: {
     fontSize: 13,
+    color: "#555",
+    marginTop: 3,
+  },
+  statusRow: {
+    flexDirection: "row",
+    marginTop: 10,
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  pending: {
+    backgroundColor: "#FEF3C7",
+  },
+  payment: {
+    backgroundColor: "#DBEAFE",
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#1F2937",
+  },
+  emptyText: {
+    textAlign: "center",
+    marginTop: 40,
+    fontSize: 16,
+    color: "#999",
   },
 });
-
-export default BookingHistoryScreen;

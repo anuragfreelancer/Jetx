@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   Image,
   TouchableOpacity,
   Dimensions,
   FlatList,
   Alert,
   ActivityIndicator,
-  Animated,
-  SafeAreaView
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -23,658 +22,508 @@ const SERVICE_FEE_PERCENTAGE = 10;
 const CharterDetailsScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { charter,bagImage, tripType, searchParams } = route.params || {};
-  
+  const { charter, bagImage, tripType, searchParams } = route.params || {};
+
   const [charterDetails, setCharterDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSeats, setSelectedSeats] = useState(1);
-  
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const scrollX = useRef(new Animated.Value(0)).current;
+
   const flatListRef = useRef(null);
-  
-  console.log('🚀 Charter Details Screen Received Data:', {
-    charter: charter,
-    charterId: charter?.aircraftInfo?.id || charter?.id,
-    tripType: tripType,
-    searchParams: searchParams
-  });
+  const autoplayRef = useRef(null);
 
-  const headerHeight = scrollY.interpolate({
-    inputRange: [0, 300],
-    outputRange: [100, 70],
-    extrapolate: 'clamp'
-  });
-
-  useEffect(() => {
-    loadCharterDetails();
-    
-    // Auto slide images if available
-    if (charterDetails?.aircraftInfo?.images?.length > 1) {
-      const interval = setInterval(() => {
-        const nextIndex = (selectedImageIndex + 1) % charterDetails.aircraftInfo.images.length;
-        setSelectedImageIndex(nextIndex);
-        flatListRef.current?.scrollToIndex({
-          index: nextIndex,
-          animated: true
-        });
-      }, 5000);
-      
-      return () => clearInterval(interval);
-    }
-  }, [selectedImageIndex, charterDetails]);
-
-  const loadCharterDetails = async () => {
+  const loadCharterDetails = useCallback(async () => {
     try {
       setLoading(true);
-       
-      // Check what data we have
-      if (charter) {
-        console.log('📊 Charter data available:', {
-          id: charter.id,
-          aircraftId: charter.aircraftInfo?.id,
-          name: charter.aircraftInfo?.name,
-          price: charter.price?.total
-        });
-      }
-      
-      // If we have aircraftInfo with id, fetch detailed information
-      if (charter?.aircraftInfo?.id) {
-      setLoading(false);
 
-         const details = await AviapagesFlightService.getCharterDetails(charter.aircraftInfo.id);
-         setCharterDetails({
+      if (!charter) {
+        Alert.alert('Error', 'No charter information available.', [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+        return;
+      }
+
+      // 1) Best case: aircraftInfo.id exists => fetch full aircraft details and merge
+      if (charter?.aircraftInfo?.id) {
+        const details = await AviapagesFlightService.getCharterDetails(charter.aircraftInfo.id);
+
+        setCharterDetails({
           ...charter,
           aircraftInfo: {
             ...charter.aircraftInfo,
-            ...details, // Merge fetched details
-            images: details?.images || charter.aircraftInfo?.images  
-          }
+            ...details,
+            images: details?.images || charter.aircraftInfo?.images || [],
+          },
         });
-      } 
-      // If we have direct aircraft id
-      else if (charter?.id) {
-         const details = await AviapagesFlightService.getCharterDetails(charter.id);
-         setCharterDetails(details);
+        return;
       }
-      // If we have basic charter data
-      else if (charter) {
-         const enhancedCharter = {
-          ...charter,
-          aircraftInfo: {
-            ...charter.aircraftInfo,
-            images: charter.aircraftInfo?.images  ,
-            // Ensure all required fields exist
-            manufacturer: charter.aircraftInfo?.manufacturer || 'Private',
-            model: charter.aircraftInfo?.model || 'Jet',
-            seats: charter.aircraftInfo?.seats || 8,
-            speed: charter.aircraftInfo?.speed || '800 km/h',
-            range: charter.aircraftInfo?.range || '4,000 km',
-            category: charter.aircraftInfo?.category || 'Luxury Jet',
-            features: charter.aircraftInfo?.features || ['WiFi', 'Entertainment', 'Luxury Seating', 'Refreshments']
-          }
-        };
-        setCharterDetails(enhancedCharter);
-      } else {
-         Alert.alert(
-          'Error',
-          'No charter information available.',
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
-        );
+
+      // 2) Fallback: charter.id exists => try fetch details
+      if (charter?.id) {
+        const details = await AviapagesFlightService.getCharterDetails(charter.id);
+        setCharterDetails(details || charter);
+        return;
       }
+
+      // 3) Basic charter only => enhance defaults
+      setCharterDetails({
+        ...charter,
+        aircraftInfo: {
+          ...charter.aircraftInfo,
+          images: charter.aircraftInfo?.images || [],
+          manufacturer: charter.aircraftInfo?.manufacturer || 'Private',
+          model: charter.aircraftInfo?.model || 'Jet',
+          seats: charter.aircraftInfo?.seats || 8,
+          speed: charter.aircraftInfo?.speed || '800 km/h',
+          range: charter.aircraftInfo?.range || '4,000 km',
+          category: charter.aircraftInfo?.category || 'Luxury Jet',
+          features:
+            charter.aircraftInfo?.features || [
+              'WiFi',
+              'Entertainment',
+              'Luxury Seating',
+              'Refreshments',
+            ],
+        },
+      });
     } catch (error) {
-       // Fallback to mock data
-      const mockData = {
+      // final fallback
+      setCharterDetails({
         ...charter,
         aircraftInfo: {
           ...charter?.aircraftInfo,
-          images: charter.aircraftInfo?.images,
+          images: charter?.aircraftInfo?.images || [],
           manufacturer: charter?.aircraftInfo?.manufacturer || 'Gulfstream',
           model: charter?.aircraftInfo?.model || 'G650',
           seats: charter?.aircraftInfo?.seats || 12,
           speed: charter?.aircraftInfo?.speed || '956 km/h',
           range: charter?.aircraftInfo?.range || '12,000 km',
           category: charter?.aircraftInfo?.category || 'Heavy Jet',
-          features: charter?.aircraftInfo?.features || ['WiFi', 'Entertainment', 'Luxury Seating', 'Refreshments', 'Conference Table', 'Private Suite']
-        }
-      };
-      setCharterDetails(mockData);
+          features:
+            charter?.aircraftInfo?.features || [
+              'WiFi',
+              'Entertainment',
+              'Luxury Seating',
+              'Refreshments',
+              'Conference Table',
+              'Private Suite',
+            ],
+        },
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, [charter, navigation]);
 
- 
+  useEffect(() => {
+    loadCharterDetails();
+  }, [loadCharterDetails]);
 
-  const handleBookNow = () => {
+  const aircraftInfo = charterDetails?.aircraftInfo || {};
+
+  // Images priority: bagImage -> aircraftInfo.images -> []
+  const images = useMemo(() => {
+    const arr = Array.isArray(bagImage) && bagImage.length ? bagImage : aircraftInfo?.images || [];
+    return arr.filter(Boolean);
+  }, [bagImage, aircraftInfo?.images]);
+
+  // Auto-slide (only when images > 1)
+  useEffect(() => {
+    if (!images?.length || images.length <= 1) return;
+
+    if (autoplayRef.current) clearInterval(autoplayRef.current);
+
+    autoplayRef.current = setInterval(() => {
+      setSelectedImageIndex((prev) => {
+        const next = (prev + 1) % images.length;
+        flatListRef.current?.scrollToIndex?.({ index: next, animated: true });
+        return next;
+      });
+    }, 4500);
+
+    return () => {
+      if (autoplayRef.current) clearInterval(autoplayRef.current);
+    };
+  }, [images]);
+
+  const maxSeats = aircraftInfo?.seats || 8;
+
+  const calculateFinalPrice = useCallback(() => {
+    if (!charterDetails) {
+      return { baseFare: 5000, serviceFee: 500, total: 5500, currency: 'USD' };
+    }
+
+    const basePrice =
+      charterDetails?.pricing?.baseFare ||
+      charterDetails?.price?.total ||
+      (charterDetails?.aircraftInfo?.hourlyRate ? charterDetails.aircraftInfo.hourlyRate * 2 : 5000);
+
+    const serviceFee = Math.round((basePrice * SERVICE_FEE_PERCENTAGE) / 100);
+    const total = basePrice + serviceFee;
+
+    return {
+      baseFare: basePrice,
+      serviceFee,
+      total,
+      currency: charterDetails?.price?.currency || 'USD',
+    };
+  }, [charterDetails]);
+
+  const pricing = calculateFinalPrice();
+
+  const handleImageScroll = useCallback((event) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(contentOffsetX / width);
+    setSelectedImageIndex(index);
+  }, []);
+
+  const goToIndex = useCallback(
+    (idx) => {
+      if (!images?.length) return;
+      const safeIndex = Math.max(0, Math.min(idx, images.length - 1));
+      setSelectedImageIndex(safeIndex);
+      flatListRef.current?.scrollToIndex?.({ index: safeIndex, animated: true });
+    },
+    [images]
+  );
+
+  const increaseSeats = useCallback(() => {
+    if (selectedSeats < maxSeats) setSelectedSeats((p) => p + 1);
+    else Alert.alert('Maximum Seats', `Maximum ${maxSeats} seats available for this aircraft.`);
+  }, [selectedSeats, maxSeats]);
+
+  const decreaseSeats = useCallback(() => {
+    if (selectedSeats > 1) setSelectedSeats((p) => p - 1);
+  }, [selectedSeats]);
+
+  const handleBookNow = useCallback(() => {
     if (!charterDetails) {
       Alert.alert('Error', 'Charter details not available');
       return;
     }
-    
+
     const bookingData = {
       charter: charterDetails,
       selectedSeats,
-      pricing: calculateFinalPrice(),
-      tripType: tripType,
-      searchParams: searchParams,
-      timestamp: new Date().toISOString()
+      pricing,
+      tripType,
+      searchParams,
+      timestamp: new Date().toISOString(),
     };
-    
-    // console.log('📤 Booking Data:', bookingData);
-    navigation.navigate('BookingFormScreen', bookingData);
-  };
 
-  const calculateFinalPrice = () => {
-    if (!charterDetails) {
-      return {
-        baseFare: 5000,
-        serviceFee: 500,
-        total: 5500,
-        currency: 'USD'
-      };
-    }
-    
-    const basePrice = charterDetails?.pricing?.baseFare || 
-                     charterDetails?.price?.total || 
-                     (charterDetails?.aircraftInfo?.hourlyRate ? 
-                      charterDetails.aircraftInfo.hourlyRate * 2 : 5000);
-    
-    const serviceFee = Math.round((basePrice * SERVICE_FEE_PERCENTAGE) / 100);
-    const total = basePrice + serviceFee;
-    
-    return {
-      baseFare: basePrice,
-      serviceFee: serviceFee,
-      total: total,
-      currency: charterDetails?.price?.currency || 'USD'
-    };
-  };
-
-  const handleImageScroll = (event) => {
-    const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const index = Math.round(contentOffsetX / width);
-    setSelectedImageIndex(index);
-  };
-
-  const renderImageItem = ({ item, index }) => (
-    <View style={styles.imageSlideItem}>
-      <Image
-        source={{ uri: item }}
-        style={styles.imageSlide}
-        resizeMode="cover"
-       />
-     </View>
-  );
-
-  const renderThumbnailItem = ({ item, index }) => (
-    <TouchableOpacity
-      style={[
-        styles.thumbnailContainer,
-        index === selectedImageIndex && styles.selectedThumbnail
-      ]}
-      onPress={() => {
-        setSelectedImageIndex(index);
-        flatListRef.current?.scrollToIndex({
-          index: index,
-          animated: true
-        });
-      }}
-      activeOpacity={0.7}
-    >
-      <Image
-        source={{ uri: item }}
-        style={styles.thumbnail}
-        resizeMode="cover"
-       />
-      {index === selectedImageIndex && (
-        <View style={styles.selectedThumbnailOverlay} />
-      )}
-    </TouchableOpacity>
-  );
-
-  const increaseSeats = () => {
-    const maxSeats = charterDetails?.aircraftInfo?.seats || 8;
-    if (selectedSeats < maxSeats) {
-      setSelectedSeats(prev => prev + 1);
-    } else {
-      Alert.alert('Maximum Seats', `Maximum ${maxSeats} seats available for this aircraft.`);
-    }
-  };
-
-  const decreaseSeats = () => {
-    if (selectedSeats > 1) {
-      setSelectedSeats(prev => prev - 1);
-    }
-  };
+    navigation.navigate('BookingFormScreen', { jet: bookingData });
+  }, [charterDetails, selectedSeats, pricing, tripType, searchParams, navigation]);
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles.center}>
         <ActivityIndicator size="large" color="#DC2626" />
-        <Text style={styles.loadingText}>Loading Charter Details</Text>
-        <Text style={styles.loadingSubtext}>Preparing your luxury experience</Text>
+        <Text style={styles.loadingTitle}>Loading Charter Details</Text>
+        <Text style={styles.loadingSub}>Preparing your luxury experience</Text>
       </View>
     );
   }
 
   if (!charterDetails) {
     return (
-      <View style={styles.errorContainer}>
-        <Icon name="error" size={60} color="#DC2626" />
-        <Text style={styles.errorText}>Unable to load charter details</Text>
-        <TouchableOpacity 
-          style={styles.retryButton}
-          onPress={loadCharterDetails}
-        >
-          <Text style={styles.retryText}>Retry</Text>
+      <View style={styles.center}>
+        <Icon name="error" size={56} color="#DC2626" />
+        <Text style={styles.errorTitle}>Unable to load charter details</Text>
+
+        <TouchableOpacity style={styles.primaryBtn} onPress={loadCharterDetails} activeOpacity={0.8}>
+          <Text style={styles.primaryBtnText}>Retry</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.backButton}
+
+        <TouchableOpacity
+          style={styles.secondaryBtn}
           onPress={() => navigation.goBack()}
+          activeOpacity={0.8}
         >
-          <Text style={styles.backText}>Go Back</Text>
+          <Text style={styles.secondaryBtnText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  const pricing = calculateFinalPrice();
-  const aircraftInfo = charterDetails?.aircraftInfo || {};
-  const images = bagImage  ;
-  // const images = aircraftInfo.images  ;
-  const maxSeats = aircraftInfo.seats || 8;
-
-  console.log('🎯 Displaying Aircraft Info:', {
-    manufacturer: aircraftInfo.manufacturer,
-    model: aircraftInfo.model,
-    seats: aircraftInfo.seats,
-    price: pricing.total,
-    images: images.length
-  });
-
   return (
-    <View style={styles.safeArea}>
-      <Animated.View style={[styles.header, { height: headerHeight }]}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
-        >
-          <Icon name="arrow-back" size={24} color="#FFF" />
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Top overlay header */}
+      <View style={styles.topBar}>
+        <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.goBack()} activeOpacity={0.8}>
+          <Icon name="arrow-back" size={22} color="#FFF" />
         </TouchableOpacity>
-        <Animated.Text 
-          style={[styles.headerTitle, { opacity: scrollY.interpolate({
-            inputRange: [0, 200],
-            outputRange: [0, 1]
-          })}]}
-          numberOfLines={1}
-        >
-          {aircraftInfo.model || 'Charter Details'}
-        </Animated.Text>
-        
-      </Animated.View>
 
-      <Animated.ScrollView 
-        style={styles.container}
+        <Text style={styles.topTitle} numberOfLines={1}>
+          {'Charter Details'}
+        </Text>
+
+        <View style={{ width: 40 }} />
+      </View>
+
+      <FlatList
+        data={[{ key: 'content' }]}
+        keyExtractor={(item) => item.key}
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
-      >
-        {/* Image Slider */}
-        <View style={styles.imageSliderContainer}>
-          <Animated.FlatList
-            ref={flatListRef}
-            data={images}
-            renderItem={renderImageItem}
-            keyExtractor={(item, index) => `image-${index}`}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={handleImageScroll}
-            scrollEventThrottle={16}
-            style={styles.imageSlider}
-            initialScrollIndex={0}
-          />
-          
-          {/* Image Counter */}
-          <View style={styles.imageCounter}>
-            <Text style={styles.imageCounterText}>
-              {selectedImageIndex + 1} / {images.length}
-            </Text>
-          </View>
-          
- 
-          {images.length > 1 && (
-            <>
-              <TouchableOpacity 
-                style={[styles.navArrow, styles.prevArrow]}
-                onPress={() => {
-                  const prevIndex = selectedImageIndex > 0 ? selectedImageIndex - 1 : images.length - 1;
-                  setSelectedImageIndex(prevIndex);
-                  flatListRef.current?.scrollToIndex({
-                    index: prevIndex,
-                    animated: true
-                  });
-                }}
-              >
-                <Icon name="chevron-left" size={28} color="#FFF" />
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.navArrow, styles.nextArrow]}
-                onPress={() => {
-                  const nextIndex = selectedImageIndex < images.length - 1 ? selectedImageIndex + 1 : 0;
-                  setSelectedImageIndex(nextIndex);
-                  flatListRef.current?.scrollToIndex({
-                    index: nextIndex,
-                    animated: true
-                  });
-                }}
-              >
-                <Icon name="chevron-right" size={28} color="#FFF" />
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
+        contentContainerStyle={{ paddingBottom: 120 }}
+        renderItem={() => (
+          <View>
+            {/* Image slider */}
+            <View style={styles.sliderWrap}>
+              {images?.length ? (
+                <>
+                  <FlatList
+                    ref={flatListRef}
+                    data={images}
+                    keyExtractor={(_, idx) => `img-${idx}`}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    onScroll={handleImageScroll}
+                    scrollEventThrottle={16}
+                    renderItem={({ item }) => (
+                      <Image source={{ uri: item }} style={styles.heroImg} resizeMode="cover" />
+                    )}
+                  />
 
-        {/* Thumbnail Strip */}
-        {images.length > 1 && (
-          <View style={styles.thumbnailStrip}>
-            <FlatList
-              data={images}
-              renderItem={renderThumbnailItem}
-              keyExtractor={(item, index) => `thumb-${index}`}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.thumbnailList}
-              contentContainerStyle={styles.thumbnailListContent}
-            />
-          </View>
-        )}
+                  <View style={styles.counterPill}>
+                    <Text style={styles.counterText}>
+                      {selectedImageIndex + 1} / {images.length}
+                    </Text>
+                  </View>
 
-        {/* Charter Details */}
-        <View style={styles.contentContainer}>
- 
-          {/* Seats Selection */}
-          <View style={styles.selectionContainer}>
-            <Text style={styles.sectionTitle}>Select Number of Passengers</Text>
-            <Text style={styles.seatsNote}>You are booking the entire aircraft</Text>
-            <View style={styles.seatsSelector}>
-              <TouchableOpacity 
-                style={[styles.seatButton, selectedSeats <= 1 && styles.seatButtonDisabled]}
-                onPress={decreaseSeats}
-                disabled={selectedSeats <= 1}
-              >
-                <Icon name="remove" size={24} color={selectedSeats <= 1 ? "#CBD5E1" : "#DC2626"} />
-              </TouchableOpacity>
-              
-              <View style={styles.seatsDisplay}>
-                <Text style={styles.seatsCount}>{selectedSeats}</Text>
-                <Text style={styles.seatsLabel}>Passengers</Text>
-              </View>
-              
-              <TouchableOpacity 
-                style={[styles.seatButton, selectedSeats >= maxSeats && styles.seatButtonDisabled]}
-                onPress={increaseSeats}
-                disabled={selectedSeats >= maxSeats}
-              >
-                <Icon name="add" size={24} color={selectedSeats >= maxSeats ? "#CBD5E1" : "#DC2626"} />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.availableSeats}>
-              Maximum {maxSeats} passengers • Entire Aircraft
-            </Text>
-          </View>
+                  {images.length > 1 && (
+                    <>
+                      <TouchableOpacity
+                        style={[styles.navArrow, styles.navLeft]}
+                        onPress={() => goToIndex(selectedImageIndex - 1 < 0 ? images.length - 1 : selectedImageIndex - 1)}
+                        activeOpacity={0.8}
+                      >
+                        <Icon name="chevron-left" size={28} color="#FFF" />
+                      </TouchableOpacity>
 
-           <View style={styles.priceCard}>
-            <View style={styles.priceHeader}>
-              <Text style={styles.priceTitle}>Flight Summary</Text>
-              <View style={styles.priceTag}>
-                <Text style={styles.totalPrice}>${pricing.total.toLocaleString()}</Text>
-                <Text style={styles.priceDuration}>Total • All Inclusive</Text>
-              </View>
-            </View>
-            
-            <View style={styles.priceBreakdown}>
-              <View style={styles.priceRow}>
-                <View>
-                  <Text style={styles.priceLabel}>Whole Aircraft Charter</Text>
-                  <Text style={styles.priceSubLabel}>Complete aircraft booking</Text>
+                      <TouchableOpacity
+                        style={[styles.navArrow, styles.navRight]}
+                        onPress={() => goToIndex(selectedImageIndex + 1 > images.length - 1 ? 0 : selectedImageIndex + 1)}
+                        activeOpacity={0.8}
+                      >
+                        <Icon name="chevron-right" size={28} color="#FFF" />
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </>
+              ) : (
+                <View style={styles.noImage}>
+                  <Icon name="image-not-supported" size={34} color="#94A3B8" />
+                  <Text style={styles.noImageText}>No images available</Text>
                 </View>
-                <Text style={styles.priceValue}>${pricing.baseFare.toLocaleString()}</Text>
+              )}
+            </View>
+
+            {/* Thumbnails */}
+            {images.length > 1 && (
+              <View style={styles.thumbBar}>
+                <FlatList
+                  data={images}
+                  keyExtractor={(_, idx) => `thumb-${idx}`}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingHorizontal: 14 }}
+                  renderItem={({ item, index }) => (
+                    <TouchableOpacity
+                      onPress={() => goToIndex(index)}
+                      activeOpacity={0.85}
+                      style={[
+                        styles.thumbWrap,
+                        index === selectedImageIndex && styles.thumbWrapActive,
+                      ]}
+                    >
+                      <Image source={{ uri: item }} style={styles.thumbImg} resizeMode="cover" />
+                    </TouchableOpacity>
+                  )}
+                />
               </View>
-              
-              <View style={styles.priceRow}>
-                <View>
-                  <Text style={styles.priceLabel}>Service Fee ({SERVICE_FEE_PERCENTAGE}%)</Text>
-                  <Text style={styles.priceSubLabel}>Booking & handling fee</Text>
+            )}
+
+            {/* Content */}
+            <View style={styles.content}>
+              {/* Seats */}
+              <View style={styles.card}>
+                <Text style={styles.h2}>Select Number of Passengers</Text>
+                <Text style={styles.p}>You are booking the entire aircraft</Text>
+
+                <View style={styles.stepper}>
+                  <TouchableOpacity
+                    style={[styles.stepBtn, selectedSeats <= 1 && styles.stepBtnDisabled]}
+                    onPress={decreaseSeats}
+                    disabled={selectedSeats <= 1}
+                    activeOpacity={0.85}
+                  >
+                    <Icon name="remove" size={22} color={selectedSeats <= 1 ? '#CBD5E1' : '#DC2626'} />
+                  </TouchableOpacity>
+
+                  <View style={styles.stepMid}>
+                    <Text style={styles.stepNum}>{selectedSeats}</Text>
+                    <Text style={styles.stepLabel}>Passengers</Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.stepBtn, selectedSeats >= maxSeats && styles.stepBtnDisabled]}
+                    onPress={increaseSeats}
+                    disabled={selectedSeats >= maxSeats}
+                    activeOpacity={0.85}
+                  >
+                    <Icon name="add" size={22} color={selectedSeats >= maxSeats ? '#CBD5E1' : '#DC2626'} />
+                  </TouchableOpacity>
                 </View>
-                <Text style={styles.priceValue}>${pricing.serviceFee.toLocaleString()}</Text>
+
+                <Text style={styles.successText}>Maximum {maxSeats} passengers • Entire Aircraft</Text>
               </View>
-              
-              <View style={styles.divider} />
-              
-              <View style={styles.priceRow}>
-                <Text style={styles.totalLabel}>Total Amount  
-                  <Text  
-                  style={styles.totalValue}
-                  > ${pricing.total.toLocaleString()}</Text>
+
+              {/* Pricing */}
+              <View style={styles.card}>
+                <View style={styles.priceHeader}>
+                  <View>
+                    <Text style={styles.priceTitle}>Flight Summary</Text>
+                    <Text style={styles.priceSub}>All Inclusive</Text>
+                  </View>
+
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={styles.priceTotal}>${pricing.total.toLocaleString()}</Text>
+                    <Text style={styles.priceCurrency}>{pricing.currency}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.line} />
+
+                <View style={styles.row}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.rowLabel}>Whole Aircraft Charter</Text>
+                    <Text style={styles.rowSub}>Complete aircraft booking</Text>
+                  </View>
+                  <Text style={styles.rowValue}>${pricing.baseFare.toLocaleString()}</Text>
+                </View>
+
+                <View style={styles.row}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.rowLabel}>Service Fee ({SERVICE_FEE_PERCENTAGE}%)</Text>
+                    <Text style={styles.rowSub}>Booking & handling fee</Text>
+                  </View>
+                  <Text style={styles.rowValue}>${pricing.serviceFee.toLocaleString()}</Text>
+                </View>
+
+                <View style={styles.line} />
+
+                <View style={styles.row}>
+                  <Text style={styles.totalLabel}>Total</Text>
+                  <Text style={styles.totalValue}>${pricing.total.toLocaleString()}</Text>
+                </View>
+
+                <View style={styles.notePill}>
+                  <Icon name="verified" size={16} color="#10B981" />
+                  <Text style={styles.noteText}>All-inclusive price. No hidden fees.</Text>
+                </View>
+              </View>
+
+              {/* Info */}
+              <View style={styles.infoCard}>
+                <Icon name="info" size={20} color="#DC2626" style={{ marginRight: 10, marginTop: 1 }} />
+                <Text style={styles.infoText}>
+                  You are booking the entire aircraft. All amenities, catering, and ground transportation included.
+                  Price includes {SERVICE_FEE_PERCENTAGE}% service fee. For custom requests, contact our concierge after booking.
                 </Text>
-              
-              </View>
-                
-            </View>
-            
-            <View style={styles.paymentNote}>
-              <Icon name="verified" size={16} color="#10B981" />
-              <Text style={styles.noteText}>
-                All-inclusive price. No hidden fees.
-              </Text>
-            </View>
-          </View>
-
-          {/* Book Button */}
-          <TouchableOpacity
-            style={styles.bookButton}
-            onPress={handleBookNow}
-           >
-            <View style={styles.bookButtonContent}>
-              <Text style={styles.bookButtonText}>Book This Charter</Text>
-              <View style={styles.bookButtonRight}>
-                <Text style={styles.bookButtonPrice}>${pricing.total.toLocaleString()}</Text>
-                <Icon name="arrow-forward" size={20} color="#FFF" />
               </View>
             </View>
-           
-          </TouchableOpacity>
-
-          {/* Additional Info */}
-          <View style={styles.infoCard}>
-            <Icon name="info" size={20} color="#DC2626" style={styles.infoIcon} />
-            <Text style={styles.infoText}>
-              You are booking the entire aircraft. All amenities, catering, and ground transportation included.
-              Price includes {SERVICE_FEE_PERCENTAGE}% service fee. For custom requests, contact our concierge after booking.
-            </Text>
           </View>
-        </View>
-      </Animated.ScrollView>
-    </View>
+        )}
+      />
+
+      {/* Sticky bottom CTA */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity style={styles.bookBtn} onPress={handleBookNow} activeOpacity={0.9}>
+          <Text style={styles.bookText}>Book</Text>
+          <View style={styles.bookRight}>
+            <Text style={styles.bookPrice}>${pricing.total.toLocaleString()}</Text>
+            <Icon name="arrow-forward" size={20} color="#FFF" />
+          </View>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
- 
-
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFF',
-  },
-  container: {
+  safe: { flex: 1, backgroundColor: '#0B1220' },
+
+  center: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
   },
-  header: {
+
+  loadingTitle: { marginTop: 14, fontSize: 16, fontWeight: '700', color: '#0F172A' },
+  loadingSub: { marginTop: 6, fontSize: 13, color: '#64748B' },
+
+  errorTitle: { marginTop: 12, fontSize: 16, fontWeight: '700', color: '#DC2626', textAlign: 'center' },
+
+  primaryBtn: { marginTop: 16, backgroundColor: '#DC2626', paddingVertical: 12, paddingHorizontal: 28, borderRadius: 12 },
+  primaryBtnText: { color: '#FFF', fontWeight: '700' },
+
+  secondaryBtn: { marginTop: 10, backgroundColor: '#E2E8F0', paddingVertical: 12, paddingHorizontal: 28, borderRadius: 12 },
+  secondaryBtnText: { color: '#0F172A', fontWeight: '700' },
+
+  topBar: {
     position: 'absolute',
-    top: 0,
+    top: 44,
     left: 0,
     right: 0,
-    backgroundColor: 'transparent',
-    zIndex: 100,
+    zIndex: 50,
+    paddingTop: 12,
+    paddingHorizontal: 16,
+    height: 56,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    justifyContent: 'space-between',
   },
-  backButton: {
+  iconBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.45)',
     alignItems: 'center',
-  },
-  shareButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
-    alignItems: 'center',
   },
-  headerTitle: {
+  topTitle: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFF',
-    textAlign: 'center',
-    marginHorizontal: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    padding: 20,
-  },
-  loadingText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1E293B',
-    marginTop: 20,
-  },
-  loadingSubtext: {
-    fontSize: 14,
-    color: '#64748B',
-    marginTop: 8,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#DC2626',
-    marginTop: 20,
-    textAlign: 'center',
-  },
-  retryButton: {
-    backgroundColor: '#DC2626',
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  retryText: {
+    marginHorizontal: 12,
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '600',
-  },
-  backButton: {
-    marginTop: 15,
-    padding: 12,
-  },
-  backText: {
-    color: '#64748B',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  // Image Slider
-  imageSliderContainer: {
-    height: height * 0.45,
-    position: 'relative',
-  },
-  imageSlider: {
-    flex: 1,
-  },
-  imageSlideItem: {
-    width: width,
-    height: '100%',
-    position: 'relative',
-  },
-  imageSlide: {
-    width: '100%',
-    height: '100%',
-  },
-  imageGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 150,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-  },
-  imageCounter: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  imageCounterText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFF',
-  },
-  imageInfoOverlay: {
-    position: 'absolute',
-    bottom: 40,
-    left: 20,
-    right: 20,
-  },
-  aircraftType: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFF',
-    letterSpacing: 2,
-    marginBottom: 4,
-  },
-  aircraftName: {
-    fontSize: 28,
     fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 8,
+    textAlign: 'center',
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+
+  sliderWrap: {
+    height: height * 0.44,
+    backgroundColor: '#0B1220',
   },
-  ratingText: {
-    fontSize: 14,
-    color: '#FFF',
-    marginLeft: 6,
-    fontWeight: '500',
+  heroImg: {
+    width,
+    height: '100%',
   },
+  counterPill: {
+    position: 'absolute',
+    top: 64,
+    right: 16,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  counterText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
+
   navArrow: {
     position: 'absolute',
     top: '50%',
@@ -682,350 +531,144 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(220, 38, 38, 0.8)',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(220,38,38,0.85)',
     alignItems: 'center',
-    zIndex: 10,
+    justifyContent: 'center',
   },
-  prevArrow: {
-    left: 15,
-  },
-  nextArrow: {
-    right: 15,
-  },
-  // Thumbnail Strip
-  thumbnailStrip: {
-    backgroundColor: '#FFF',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  thumbnailList: {
-    paddingHorizontal: 10,
-  },
-  thumbnailListContent: {
-    paddingHorizontal: 5,
-  },
-  thumbnailContainer: {
-    marginHorizontal: 5,
-    borderRadius: 8,
+  navLeft: { left: 14 },
+  navRight: { right: 14 },
+
+  noImage: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  noImageText: { marginTop: 8, color: '#94A3B8', fontWeight: '700' },
+
+  thumbBar: { backgroundColor: '#FFFFFF', paddingVertical: 10 },
+  thumbWrap: {
+    width: 78,
+    height: 58,
+    borderRadius: 10,
     overflow: 'hidden',
+    marginRight: 10,
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  selectedThumbnail: {
-    borderColor: '#DC2626',
+  thumbWrapActive: { borderColor: '#DC2626' },
+  thumbImg: { width: '100%', height: '100%' },
+
+  content: {
+    backgroundColor: '#F8FAFC',
+    paddingTop: 14,
+    paddingHorizontal: 16,
   },
-  selectedThumbnailOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(220, 38, 38, 0.1)',
-  },
-  thumbnail: {
-    width: 80,
-    height: 60,
-  },
-  // Content Container
-  contentContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    paddingTop: 20,
-  },
-  // Specifications
-  specsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+
+  card: {
     backgroundColor: '#FFF',
     borderRadius: 16,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 14,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-  specCard: {
-    alignItems: 'center',
-    width: '23%',
-    marginBottom: 10,
-  },
-  specIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  specValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1E293B',
-    marginBottom: 2,
-  },
-  specLabel: {
-    fontSize: 12,
-    color: '#64748B',
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  // Seats Selection
-  selectionContainer: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1E293B',
-    marginBottom: 8,
-  },
-  seatsNote: {
-    fontSize: 14,
-    color: '#64748B',
-    marginBottom: 16,
-  },
-  seatsSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+
+  h2: { fontSize: 16, fontWeight: '800', color: '#0F172A' },
+  p: { marginTop: 6, fontSize: 13, color: '#64748B' },
+
+  stepper: {
+    marginTop: 14,
     backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 12,
-  },
-  seatButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: '#FFF',
-    justifyContent: 'center',
+    borderRadius: 14,
+    padding: 6,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  stepBtn: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 2,
   },
-  seatButtonDisabled: {
-    backgroundColor: '#F1F5F9',
-  },
-  seatsDisplay: {
-    alignItems: 'center',
-  },
-  seatsCount: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#DC2626',
-  },
-  seatsLabel: {
-    fontSize: 12,
-    color: '#64748B',
-    fontWeight: '500',
-  },
-  availableSeats: {
-    fontSize: 14,
-    color: '#10B981',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  // Features
-  featuresContainer: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  featuresGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  featureItem: {
-    alignItems: 'center',
-    width: '30%',
-    marginBottom: 15,
-  },
-  featureText: {
-    fontSize: 12,
-    color: '#475569',
-    marginTop: 6,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  // Price Card
-  priceCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    marginBottom: 20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  priceHeader: {
-    backgroundColor: '#DC2626',
-    padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  priceTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFF',
-  },
-  priceTag: {
-    alignItems: 'flex-end',
-  },
-  totalPrice: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#FFF',
-  },
-  priceDuration: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontWeight: '500',
-  },
-  priceBreakdown: {
-    padding: 20,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  priceLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1E293B',
-  },
-  priceSubLabel: {
-    fontSize: 12,
-    color: '#94A3B8',
-    marginTop: 2,
-  },
-  priceValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1E293B',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E2E8F0',
-    marginVertical: 16,
-  },
-  totalLabel: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1E293B',
-  },
-  totalContainer: {
-    marginTop:20 ,
-    marginLeft:22
-   },
-  totalValue: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#DC2626',
-  },
-  entireAircraftNote: {
-    fontSize: 12,
-    color: '#94A3B8',
-    marginTop: 2,
-    fontWeight: '500',
-    fontStyle: 'italic',
-  },
-  paymentNote: {
+  stepBtnDisabled: { backgroundColor: '#F1F5F9' },
+  stepMid: { alignItems: 'center' },
+  stepNum: { fontSize: 26,   color: '#DC2626' },
+  stepLabel: { fontSize: 12,  color: '#64748B', marginTop: 2 },
+  successText: { marginTop: 10, textAlign: 'center', color: '#10B981', fontWeight: '800' },
+
+  priceHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  priceTitle: { fontSize: 16,   color: '#0F172A' },
+  priceSub: { marginTop: 4, fontSize: 12, color: '#64748B', fontWeight: '700' },
+  priceTotal: { fontSize: 20,   color: '#DC2626' },
+  priceCurrency: { marginTop: 2, fontSize: 12, color: '#64748B', fontWeight: '700' },
+
+  row: { marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  rowLabel: { fontSize: 14,   color: '#0F172A' },
+  rowSub: { marginTop: 2, fontSize: 12, color: '#94A3B8', fontWeight: '700' },
+  rowValue: { fontSize: 14,   color: '#0F172A' },
+
+  line: { height: 1, backgroundColor: '#E2E8F0', marginTop: 14 },
+
+  totalLabel: { fontSize: 15, fontWeight: '900', color: '#0F172A' },
+  totalValue: { fontSize: 18, fontWeight: '900', color: '#DC2626' },
+
+  notePill: {
+    marginTop: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEF2F2',
-    padding: 12,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 10,
+    backgroundColor: '#ECFDF5',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
   },
-  noteText: {
-    fontSize: 14,
-    color: '#DC2626',
-    marginLeft: 8,
-    fontWeight: '500',
-  },
-  // Book Button
-  bookButton: {
-    backgroundColor: '#DC2626',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#DC2626',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  bookButtonContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  bookButtonText: {
-    color: '#FFF',
-    fontSize: 20,
-    fontWeight: '800',
-    flex: 1,
-  },
-  bookButtonRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  bookButtonPrice: {
-    color: '#FFF',
-    fontSize: 20,
-    fontWeight: '800',
-    marginRight: 12,
-  },
-  bookButtonSubtext: {
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  // Info Card
+  noteText: { marginLeft: 8, color: '#065F46', fontWeight: '800', fontSize: 13 },
+
   infoCard: {
     backgroundColor: '#FEF2F2',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 14,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'flex-start',
+    marginBottom: 16,
   },
-  infoIcon: {
-    marginRight: 12,
-    marginTop: 2,
+  infoText: { flex: 1, color: '#7F1D1D', fontSize: 13, lineHeight: 18, fontWeight: '700' },
+
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(248,250,252,0.96)',
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 14,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
   },
-  infoText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#7F1D1D',
-    lineHeight: 20,
+  bookBtn: {
+    backgroundColor: '#DC2626',
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#DC2626',
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
   },
+  bookText: { color: '#FFF', fontWeight: '900', fontSize: 18 },
+  bookRight: { flexDirection: 'row', alignItems: 'center' },
+  bookPrice: { color: '#FFF', fontWeight: '900', fontSize: 18, marginRight: 10 },
 });
 
 export default CharterDetailsScreen;

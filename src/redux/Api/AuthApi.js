@@ -1073,4 +1073,80 @@ const GetChat = async (
         );
     }
 };
-export { SendMessage,GetNotifications, GetChat, FeedbackApicall, PrivacyPolicyApi, GetAllChatMessage, GetSubmitRPF, SumitRpfFrom, PlayerPostEditApi, Getplayer, TrainingCategory, PositioncCategory, Teamcategory, PlayerPostApi, GetaboutusePolicyApi, AddContactUs, ChangePasswordApi, LoginUserApi, UpdateProfile_Api, GetProfile, SinupUserApi, ForgotPassUserApi, OtpUserApi, UpdatePassUserApi }  
+
+
+
+
+
+ const BookingApi = async (param, setLoading) => {
+  try {
+    setLoading(true);
+
+    const myHeaders = new Headers();
+    myHeaders.append("Accept", "application/json");
+
+    const formData = new FormData();
+    formData.append("user_id", param?.user_id);
+    formData.append("flight_name", param?.flight_name);
+    formData.append("source_airport_name", param?.source_airport_name);
+    formData.append("destination_airport_name", param?.destination_airport_name);
+    formData.append("journey_date", param?.journey_date);
+    formData.append("total_passengers", param?.total_passengers);
+    formData.append("total_amount", param?.total_amount);
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: formData,
+    };
+
+    const response = await fetch(
+      `${base_url}add_booking`,
+      requestOptions
+    );
+
+    const responseText = await response.text();
+    const result = JSON.parse(responseText);
+
+    if (result.status == "1") {
+      successToast(result?.message);
+      return result;
+    } else {
+      errorToast(result?.message || result?.error);
+      return result;
+    }
+  } catch (error) {
+    console.error("API Error:", error);
+    errorToast("Network error");
+  } finally {
+    setLoading(false);
+  }
+};
+  const GetBookingsByUserApi = async (userId, setLoading) => {
+  try {
+    setLoading(true);
+
+    const response = await fetch(
+      `${base_url}get_bookings_by_user?user_id=${userId}`
+    );
+
+    const responseText = await response.text();
+    const result = JSON.parse(responseText);
+    console.log("responseq",response)
+
+    if (result.status == "1") {
+      return result?.result || [];
+    } else {
+      errorToast(result?.message || "No bookings found");
+      return [];
+    }
+  } catch (error) {
+    console.error("Get booking API error:", error);
+    errorToast("Network error");
+    return [];
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+export { BookingApi , GetChat,GetBookingsByUserApi, FeedbackApicall, PrivacyPolicyApi, GetAllChatMessage, GetSubmitRPF, SumitRpfFrom, PlayerPostEditApi, Getplayer, TrainingCategory, PositioncCategory, Teamcategory, PlayerPostApi, GetaboutusePolicyApi, AddContactUs, ChangePasswordApi, LoginUserApi, UpdateProfile_Api, GetProfile, SinupUserApi, ForgotPassUserApi, OtpUserApi, UpdatePassUserApi }  

@@ -1072,13 +1072,30 @@ const HomeScreen = () => {
         return;
       }
       setLoading(true);
-       const data = await AviapagesFlightService.searchFlights(
-        searchParams.origin,
-        searchParams.destination,
-        searchParams.departureDate,
-        tripType === 'round-trip' ? searchParams.returnDate : '',
-        searchParams.adults + searchParams.children + searchParams.infants
+      
+      console.log('🔍 Searching flights with params:', {
+        origin: searchParams.origin,
+        destination: searchParams.destination,
+        departureDate: searchParams.departureDate,
+        departureTime: searchParams.departureTime,
+        returnDate: tripType === 'round-trip' ? searchParams.returnDate : null,
+        returnTime: searchParams.returnTime,
+        passengers: searchParams.adults + searchParams.children + searchParams.infants,
+      });
+      
+      // Call API with correct parameters
+      const data = await AviapagesFlightService.searchFlights(
+        searchParams.origin,                                              // origin (ICAO code)
+        searchParams.destination,                                         // destination (ICAO code)
+        searchParams.departureDate,                                       // departureDate
+        searchParams.departureTime,                                       // departureTime
+        tripType === 'round-trip' ? searchParams.returnDate : null,       // returnDate
+        searchParams.returnTime,                                          // returnTime
+        searchParams.adults + searchParams.children + searchParams.infants, // passengers
+        false                                                             // flexibleTiming
       );
+      
+      console.log('✅ API Response:', data?.metadata?.source, 'Total flights:', data?.data?.length);
 
       if (data && data.data && data.data.length > 0) {
          const flightsWithPreferredTime = data.data.map(flight => {
