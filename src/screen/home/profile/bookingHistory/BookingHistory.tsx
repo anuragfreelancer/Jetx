@@ -56,9 +56,7 @@ const MyBookingsScreen = ({ featureState, route }) => {
           <View style={[styles.badge, styles.pending]}>
             <Text style={styles.badgeText}>{item.booking_status}</Text>
           </View>
-          <View style={[styles.badge, styles.payment]}>
-            <Text style={styles.badgeText}>{item.payment_status}</Text>
-          </View>
+          
         </View>
       </View>
     );

@@ -166,7 +166,7 @@ const FlightBookingScreen = ({ route, navigation }) => {
         <ScrollView showsVerticalScrollIndicator={false}>
           
           {/* ============================================ */}
-          {/* BOOKING SUMMARY - Auto-filled flight details */}
+          {/* BOOKING SUMMARY - So the customer can confirm exactly what they're booking (flight, route, price) before entering passenger details and paying. */}
           {/* ============================================ */}
           <View style={styles.summaryCard}>
             <Text style={styles.summaryTitle}>Booking Summary</Text>

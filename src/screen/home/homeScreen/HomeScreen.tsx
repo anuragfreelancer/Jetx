@@ -885,6 +885,8 @@ const HomeScreen = () => {
   const [searchParams, setSearchParams] = useState({
     origin: '',
     destination: '',
+    originDisplay: '',   // From airport list API – e.g. "Dubai International (DXB)"
+    destinationDisplay: '',
     departureDate: departureDate,
     departureTime: '08:00', // Default departure time
     returnDate: '',
@@ -906,13 +908,21 @@ const HomeScreen = () => {
   const [showReturnPicker, setShowReturnPicker] = useState(false);
   const [selectedDateType, setSelectedDateType] = useState('');
 
-  // Airport selection handlers
+  // Airport selection handlers – use Aviapages airport list API (AirportSearchModal)
   const handleSelectAirport = (airport: any) => {
-    setSearchParams(prev => ({ ...prev, origin: airport.code }));
+    setSearchParams(prev => ({
+      ...prev,
+      origin: airport.code, // ICAO for API
+      originDisplay: airport.name || `${airport.code}`,
+    }));
   };
 
   const handleSelectAirport2 = (airport: any) => {
-    setSearchParams(prev => ({ ...prev, destination: airport.code }));
+    setSearchParams(prev => ({
+      ...prev,
+      destination: airport.code,
+      destinationDisplay: airport.name || `${airport.code}`,
+    }));
   };
 
   // Format date for display
@@ -1135,12 +1145,12 @@ const HomeScreen = () => {
         });
         
         setFlights(flightsWithPreferredTime);
-        setPrivateJets(flightsWithPreferredTime.slice(0, 3));
+        setPrivateJets(flightsWithPreferredTime); // Show all charters so customer can compare prices
         Alert.alert('Success', `Found ${flightsWithPreferredTime.length} ${tripType} flights departing at ${searchParams.departureTime}!`);
       } else {
         setFlights([]);
         setPrivateJets([]);
-        Alert.alert('Info', `No ${tripType} flights found for your search criteria. Please try different airports, dates, or times.`);
+        Alert.alert('Info', `No ${tripType} flights found for your search. Try different airports, dates, or times.`);
       }
 
     } catch (error) {
@@ -1170,7 +1180,9 @@ const HomeScreen = () => {
     setSearchParams(prev => ({
       ...prev,
       origin: prev.destination,
-      destination: prev.origin
+      destination: prev.origin,
+      originDisplay: prev.destinationDisplay,
+      destinationDisplay: prev.originDisplay,
     }));
   };
 
@@ -1399,8 +1411,8 @@ const HomeScreen = () => {
                   <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.inputWithIcon}>
                     <Image source={imageIndex.location2} style={styles.inputIcon} />
                     <Text style={[styles.inputField, { maxWidth: '100%' }]} numberOfLines={1}>
-                      {searchParams.origin
-                        ? `${searchParams.origin}`
+                      {searchParams.originDisplay || searchParams.origin
+                        ? (searchParams.originDisplay || searchParams.origin)
                         : 'Departure city'
                       }
                     </Text>
@@ -1424,8 +1436,8 @@ const HomeScreen = () => {
                       onPress={() => setIsModalVisible2(true)}
                     >
                       <Text>
-                        {searchParams.destination
-                          ? `${searchParams.destination}`
+                        {searchParams.destinationDisplay || searchParams.destination
+                          ? (searchParams.destinationDisplay || searchParams.destination)
                           : 'To'
                         }
                       </Text>

@@ -800,32 +800,26 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
             const airportResults = response?.results || response || [];
             
             if (airportResults && airportResults.length > 0) {
-                // Transform API response to our format
+                // Transform Aviapages API response (v3/airports/?search=) – all data from API only
                 const formattedAirports = airportResults.map((airport: any) => ({
                     id: airport.id || airport.icao || airport.iata,
-                    displayName: `${airport.name} (${airport.iata || airport.icao})`,
+                    displayName: `${airport.name || 'Airport'} (${airport.iata || airport.icao || ''})`,
                     name: airport.name,
                     iataCode: airport.iata || '',
                     icaoCode: airport.icao || '',
-                    city: airport.city_name || airport.city || '',
-                    country: airport.country_name || airport.country || '',
+                    city: airport.city?.name ?? airport.city_name ?? airport.city ?? '',
+                    country: airport.country?.name ?? airport.country_name ?? airport.country ?? '',
                     subType: 'AIRPORT',
-                    // Additional info from API
                     latitude: airport.latitude,
                     longitude: airport.longitude,
                     timezone: airport.timezone,
                 }));
-                
                 console.log('✅ Formatted', formattedAirports.length, 'airports from API');
                 setAirports(formattedAirports);
             } else {
-                console.log('⚠️ No airports from API, using fallback');
-                // If no results from API, use fallback
                 useFallbackData(query);
             }
         } catch (error) {
-            console.error('❌ Error searching airports with Aviapages API:', error);
-            // On error, use fallback data
             useFallbackData(query);
         } finally {
             setLoading(false);
