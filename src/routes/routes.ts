@@ -19,6 +19,7 @@ import PaymentVerify from "../screen/home/paymentverify/Paymentverify";
 import ProfileScreen from "../screen/home/profile/userProfile/ProfileScreen";
 import ProfileEdit from "../screen/home/profile/profileEdit/ProfileEdit";
 import BookingHistory from "../screen/home/profile/bookingHistory/BookingHistory";
+import AdminBookingsScreen from "../screen/home/profile/bookingHistory/AdminBookingsScreen";
 import SavedPreferences from "../screen/home/savedPreferences/SavedPreferences";
 import PaymentMethods from "../screen/home/paymentMethods/PaymentMethods";
 import Notification from "../screen/home/notification/Notification";
@@ -62,6 +63,7 @@ const _routes = () => {
        { name: ScreenNameEnum.ProfileScreen, Component: ProfileScreen },
        { name: ScreenNameEnum.ProfileEdit, Component: ProfileEdit },
        { name: ScreenNameEnum.BookingHistory, Component: BookingHistory },
+       { name: ScreenNameEnum.AdminBookings, Component: AdminBookingsScreen },
        { name: ScreenNameEnum.SavedPreferences, Component: SavedPreferences },
        { name: ScreenNameEnum.PaymentMethods, Component: PaymentMethods },
        { name: ScreenNameEnum.Notifications, Component: Notification },

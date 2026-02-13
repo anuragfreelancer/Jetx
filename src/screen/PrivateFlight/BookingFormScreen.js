@@ -55,7 +55,6 @@ const FlightBookingScreen = ({ route, navigation }) => {
   const currency = priceData?.currency || "USD";
   const total = priceData?.total || 0;
   const base = priceData?.base || priceData?.baseFare || 0;
-  const serviceFee = priceData?.serviceFee || 0;
   
   // Passengers and seats
   const totalPassengers = String(
@@ -86,7 +85,6 @@ const FlightBookingScreen = ({ route, navigation }) => {
   const [lastName, setLastName] = useState(userData?.last_name || '');
   const [contactEmail, setContactEmail] = useState(userData?.email || '');
   const [contactPhone, setContactPhone] = useState(userData?.mobile || userData?.phone || '');
-  const [seatPreference, setSeatPreference] = useState('');
   const [specialRequests, setSpecialRequests] = useState('');
   
   const [journeyDate, setJourneyDate] = useState(initialJourneyDate);
@@ -132,14 +130,12 @@ const FlightBookingScreen = ({ route, navigation }) => {
       passenger_name: `${fullName} ${lastName}`.trim(),
       contact_email: contactEmail,
       contact_phone: contactPhone,
-      seat_preference: seatPreference,
       special_requests: specialRequests,
       // Additional flight info
       aircraft_name: flightName,
       aircraft_id: aircraftInfo?.id || charter?.id,
       currency: currency,
       base_fare: String(base),
-      service_fee: String(serviceFee),
     };
 
     console.log("📝 Booking Payload =>", payload);
@@ -206,18 +202,11 @@ const FlightBookingScreen = ({ route, navigation }) => {
 
             <View style={styles.divider} />
 
-            {/* Price Breakdown */}
+            {/* Price */}
             <View style={styles.row}>
               <Text style={styles.leftText}>Base Fare</Text>
               <Text style={styles.rightText}>
                 {currency} {base.toLocaleString()}
-              </Text>
-            </View>
-
-            <View style={styles.row}>
-              <Text style={styles.leftText}>Service Fee (10%)</Text>
-              <Text style={styles.rightText}>
-                {currency} {serviceFee.toLocaleString()}
               </Text>
             </View>
 
@@ -287,13 +276,6 @@ const FlightBookingScreen = ({ route, navigation }) => {
               />
             )}
 
-            <Input 
-              label="Seat Preference" 
-              value={seatPreference} 
-              onChange={setSeatPreference}
-              placeholder="e.g., Window, Aisle, Front cabin"
-            />
-            
             <Input 
               label="Special Requests" 
               value={specialRequests} 

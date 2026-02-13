@@ -1148,5 +1148,25 @@ const GetChat = async (
   }
 };
 
+/** Fetch all bookings (for admin). Backend should expose get_all_bookings and restrict by role. */
+const GetAllBookingsApi = async (setLoading) => {
+  try {
+    setLoading(true);
+    const response = await fetch(`${base_url}get_all_bookings`);
+    const responseText = await response.text();
+    const result = JSON.parse(responseText);
+    if (result.status == "1") {
+      return result?.result || result?.data || [];
+    }
+    errorToast(result?.message || "No bookings found");
+    return [];
+  } catch (error) {
+    console.error("Get all bookings API error:", error);
+    errorToast("Network error");
+    return [];
+  } finally {
+    setLoading(false);
+  }
+};
 
-export { BookingApi , GetChat,GetBookingsByUserApi, FeedbackApicall, PrivacyPolicyApi, GetAllChatMessage, GetSubmitRPF, SumitRpfFrom, PlayerPostEditApi, Getplayer, TrainingCategory, PositioncCategory, Teamcategory, PlayerPostApi, GetaboutusePolicyApi, AddContactUs, ChangePasswordApi, LoginUserApi, UpdateProfile_Api, GetProfile, SinupUserApi, ForgotPassUserApi, OtpUserApi, UpdatePassUserApi }  
+export { BookingApi , GetChat, GetBookingsByUserApi, GetAllBookingsApi, FeedbackApicall, PrivacyPolicyApi, GetAllChatMessage, GetSubmitRPF, SumitRpfFrom, PlayerPostEditApi, Getplayer, TrainingCategory, PositioncCategory, Teamcategory, PlayerPostApi, GetaboutusePolicyApi, AddContactUs, ChangePasswordApi, LoginUserApi, UpdateProfile_Api, GetProfile, SinupUserApi, ForgotPassUserApi, OtpUserApi, UpdatePassUserApi }  

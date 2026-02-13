@@ -34,7 +34,7 @@ export default function CreateNewPassword() {
         <CustomHeader imageSource={imageIndex.backorange} />
       </View>
       <ScrollView showsVerticalScrollIndicator={false} >
-        {isLoading ? <LoadingModal /> : null}
+                 <LoadingModal visible={isLoading}/>
 
         <View
           style={{

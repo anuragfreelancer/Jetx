@@ -43,7 +43,8 @@ export default function SignUp() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBarCompoent />
-      {isLoading && <LoadingModal />}
+       <LoadingModal visible={isLoading}/>
+
       
       <ScrollView 
         showsVerticalScrollIndicator={false}
@@ -129,14 +130,14 @@ export default function SignUp() {
             )}
 
             {/* City */}
-            <TextInputField
+            {/* <TextInputField
               onChangeText={(value: string) => handleChange('city', value)}
               placeholder="City"
               value={credentials.city}
               firstLogo={true}
               showEye={false}
               img={imageIndex.city}
-            />
+            /> */}
 
           
  
@@ -203,8 +204,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logo: {
-    height: 57,
-    width: 176,
+    height: 59,
+    width: 200,
   },
   titleContainer: {
     marginTop: 22,

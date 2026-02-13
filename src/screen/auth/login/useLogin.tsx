@@ -16,7 +16,7 @@ interface Credentials {
 
 const [credentials, setCredentials] = useState<Credentials>({
   email: 'Gsp@gmail.com',
-  password: '12345678',
+  password: '123456',
 });
 const dispatch = useDispatch()
 const handleChange = (field: keyof Credentials, value: string) => {

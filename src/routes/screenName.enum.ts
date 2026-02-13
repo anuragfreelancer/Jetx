@@ -26,6 +26,7 @@ HomeScreen="HomeScreen" ,
   ProfileScreen="ProfileScreen" ,
   ProfileEdit="ProfileEdit",
   BookingHistory="BookingHistory",
+  AdminBookings="AdminBookings",
   SavedPreferences="SavedPreferences" ,
   PaymentMethods="PaymentMethods"
 }

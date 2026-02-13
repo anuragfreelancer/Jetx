@@ -30,7 +30,8 @@ export default function PasswordReset() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <StatusBarCompoent />
       <ScrollView showsVerticalScrollIndicator={false} >
-        {isLoading ? <LoadingModal /> : null}
+             <LoadingModal visible={isLoading}/>
+
         <View style={{ marginTop: 18 }}>
           <CustomHeader imageSource={imageIndex.backorange} />
         </View>

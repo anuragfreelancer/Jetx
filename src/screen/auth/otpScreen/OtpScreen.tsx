@@ -9,6 +9,7 @@ import CustomButton from '../../../compoent/CustomButton';
 import StatusBarComponent from '../../../compoent/StatusBarCompoent';
 import CustomHeader from '../../../compoent/CustomHeader';
 import useOtp from './useOtp';
+import LoadingModal from '../../../utils/Loader';
  
 export default function OtpScreen() {
   const { props, getCellOnLayoutHandler,
@@ -24,7 +25,8 @@ export default function OtpScreen() {
       backgroundColor: '#FFF',
       flex: 1,
     }}>
-      {isLoading ? <Loading /> : null}
+                 <LoadingModal visible={isLoading}/>
+
       <SafeAreaView style={{ flex: 1 }}>
         <StatusBarComponent />
         <View style={{ marginTop: 18 }}>

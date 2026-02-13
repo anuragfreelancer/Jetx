@@ -64,10 +64,7 @@ const useSignup = () => {
     // Mobile validation
     if (!mobile.trim()) {
       validationErrors.mobile = 'Mobile number is required.';
-    } else if (!mobileRegex.test(mobile.replace(/\D/g, ''))) {
-      validationErrors.mobile = 'Enter a valid mobile number.';
-    }
-
+    }  
     // Password validation
     if (!password.trim()) {
       validationErrors.password = 'Password is required.';
