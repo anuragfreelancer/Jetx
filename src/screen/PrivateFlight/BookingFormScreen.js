@@ -50,19 +50,25 @@ const FlightBookingScreen = ({ route, navigation }) => {
                              charter?.itineraries?.[0]?.segments?.[0]?.arrival?.iataCode || 
                              params?.destination || '';
   
-  // Price data
-  const priceData = charter?.price || charter?.pricing || params?.jet?.price || {};
+  // Price data (include jet.pricing from CharterDetailsScreen)
+  const priceData = charter?.price || charter?.pricing || params?.jet?.pricing || params?.jet?.price || {};
   const currency = priceData?.currency || "USD";
   const total = priceData?.total || 0;
   const base = priceData?.base || priceData?.baseFare || 0;
-  
-  // Passengers and seats
-  const totalPassengers = String(
-    searchParams?.adults + searchParams?.children + searchParams?.infants || 
-    params?.jet?.selectedSeats || 
-    aircraftInfo?.seats || 
-    1
-  );
+
+  // Passengers: prefer selectedSeats from Charter Details, then search params sum, then aircraft seats
+  const totalPassengers = (() => {
+    const fromCharter = params?.jet?.selectedSeats;
+    if (fromCharter != null && Number(fromCharter) > 0) {
+      return String(fromCharter);
+    }
+    const adults = Number(searchParams?.adults ?? 0);
+    const children = Number(searchParams?.children ?? 0);
+    const infants = Number(searchParams?.infants ?? 0);
+    const sum = adults + children + infants;
+    if (sum > 0) return String(sum);
+    return String(aircraftInfo?.seats ?? 1);
+  })();
   
   // Journey date from search params
   const initialJourneyDate = searchParams?.departureDate 
