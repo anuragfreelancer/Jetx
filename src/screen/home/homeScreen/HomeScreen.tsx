@@ -1326,7 +1326,7 @@ const HomeScreen = () => {
             </Text>
           </View>
           <View style={styles.headerIcons}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.iconButton}
               onPress={() => navigation.navigate(ScreenNameEnum.Notifications)}
             >
@@ -1336,7 +1336,7 @@ const HomeScreen = () => {
                 resizeMode='contain'
               />
               <View style={styles.notificationBadge} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               style={styles.iconButton}
               onPress={() => navigation.navigate(ScreenNameEnum.ProfileScreen)}

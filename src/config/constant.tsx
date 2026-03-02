@@ -26,6 +26,7 @@ export const constant = {
   getNotifications:"getNotifications",
 
   getHotels :"get_hotels",
+  getFlights: "get_flights",
   getCategory:"get_category",
   Getfaq:"get_faq",
   AddContact_us:"add_contact_us"

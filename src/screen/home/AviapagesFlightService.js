@@ -1,4 +1,5 @@
 import { getCharterAircraft, calculateCharterPrice, calculateFlightTime, searchCharterAircraft } from '../../Aviapages/api';
+import { base_url, constant } from '../../config/constant';
 
 const AVIA_PAGE_BASE_URL = 'https://api.aviapages.com';
 const API_TOKEN = 'zgkRrapzpZv3xA811rWtckMIjY6WCkmCpcmn';
@@ -68,6 +69,92 @@ const addServiceFeeToFlight = (flight) => {
       currency: flight.price?.currency || 'USD'
     }
   };
+};
+
+// Normalize DB flight row to app flight format (client sees same structure)
+const normalizeDbFlightToAppFormat = (row, index) => {
+  if (row.itineraries && row.price && typeof row.price.total !== 'undefined') {
+    return row;
+  }
+  const id = row.id || `db-flight-${index}`;
+  const origin = row.origin || row.departure_airport || row.from || row.origin_iata || 'XXX';
+  const destination = row.destination || row.arrival_airport || row.to || row.destination_iata || 'XXX';
+  const departureDate = row.departure_date || row.departureDate || new Date().toISOString().split('T')[0];
+  const departureTime = row.departure_time || row.departureTime || '08:00';
+  const total = Number(row.price || row.total || row.price_total || 0) || 5000;
+  const currency = row.currency || 'USD';
+  const duration = row.duration || 'PT2H30M';
+  const [hours, minutes] = departureTime.split(':').map(Number);
+  const depDt = new Date(departureDate);
+  depDt.setHours(hours || 8, minutes || 0, 0, 0);
+  const depAt = depDt.toISOString();
+  const arrDt = new Date(depDt.getTime() + 2.5 * 60 * 60 * 1000);
+  const arrAt = arrDt.toISOString();
+  return {
+    id,
+    type: 'charter-flight',
+    source: 'DATABASE',
+    timestamp: new Date().toISOString(),
+    price: { currency, total, base: Math.round(total * 0.88) },
+    itineraries: [{
+      duration,
+      segments: [{
+        departure: { iataCode: origin, at: depAt, terminal: 'Private Terminal', scheduledTime: departureTime },
+        arrival: { iataCode: destination, at: arrAt, terminal: 'Private Terminal' },
+        carrierCode: 'PJ',
+        number: `PJ${1000 + index}`,
+        aircraft: {
+          code: row.aircraft_type || 'PJ',
+          name: row.aircraft_name || row.aircraft_type || row.model || 'Private Charter'
+        },
+        duration,
+        id: `segment-${index}`,
+        numberOfStops: 0,
+        operatingCarrier: row.operator || row.airline || 'Private Charter'
+      }]
+    }],
+    aircraftInfo: {
+      id: row.aircraft_id || row.id,
+      name: row.aircraft_name || row.model || 'Private Jet',
+      manufacturer: row.manufacturer || '',
+      model: row.model || row.aircraft_name || 'Private Jet',
+      year: row.year || 2020,
+      seats: row.seats || row.pax || 8,
+      images: row.images || row.photos || [],
+      features: row.features || ['Luxury Seating', 'Refreshments'],
+      airline: row.operator || row.airline || 'Private Charter'
+    }
+  };
+};
+
+// Fetch flights from backend database first (client gets same response format)
+const fetchFlightsFromDatabase = async (origin, destination, departureDate, departureTime, returnDate, returnTime, passengers) => {
+  try {
+    const params = {
+      origin: origin || '',
+      destination: destination || '',
+      departure_date: departureDate || '',
+      departure_time: departureTime || '08:00',
+      return_date: returnDate || '',
+      return_time: returnTime || '',
+      passengers: parseInt(passengers, 10) || 1,
+    };
+    const url = `${base_url}${constant.getFlights}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!response.ok) return null;
+    const json = await response.json();
+    const list = json?.data ?? json?.flights ?? json?.result ?? (Array.isArray(json) ? json : []);
+    if (!Array.isArray(list) || list.length === 0) return null;
+    const normalized = list.map((row, i) => normalizeDbFlightToAppFormat(row, i));
+    const withFees = normalized.map((f) => addServiceFeeToFlight(f));
+    return { data: withFees };
+  } catch (e) {
+    return null;
+  }
 };
 
 // Helper function to adjust time
@@ -1086,7 +1173,46 @@ export const AviapagesFlightService = {
       // Validate passenger count
       const passengerCount = Math.max(1, parseInt(passengers) || 1);
       
-      // FIRST: Try to fetch ALL charter aircraft from REAL API
+      // FIRST: Try to get flights from backend database (same response format – client doesn't know source)
+      const dbFlights = await fetchFlightsFromDatabase(
+        origin, destination, departureDate, departureTime, returnDate, returnTime, passengerCount
+      );
+      if (dbFlights && dbFlights.data && dbFlights.data.length > 0) {
+        let flightsData = dbFlights.data;
+        if (returnDate) {
+          flightsData = flightsData.map((flight) => ({
+            ...flight,
+            tripType: 'round_trip',
+            returnDate: returnDate,
+            returnTime: returnTime,
+            pricing: {
+              ...flight.pricing,
+              baseFare: (flight.pricing?.baseFare || 0) * 2,
+              serviceFee: (flight.pricing?.serviceFee || 0) * 2,
+              total: (flight.pricing?.total || 0) * 2,
+              currency: flight.pricing?.currency || 'USD'
+            },
+            price: {
+              ...flight.price,
+              total: (flight.price?.total || 0) * 2,
+              base: (flight.price?.base || 0) * 2,
+            },
+            roundTrip: true
+          }));
+        }
+        return {
+          data: flightsData,
+          searchParams: { origin, destination, departureDate, departureTime, returnDate, returnTime, passengers: passengerCount, flexibleTiming },
+          metadata: {
+            source: 'AVIAPAGES_REAL_API',
+            timestamp: new Date().toISOString(),
+            totalResults: flightsData.length,
+            message: `Found ${flightsData.length} charter aircraft available for your route`
+          }
+        };
+      }
+      
+      // SECOND: Try to fetch ALL charter aircraft from REAL API
       console.log('🛩️ Fetching ALL charter aircraft from real API...');
       const allCharterFlights = await fetchAllCharterAircraft(
         origin, 

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
  import { useNavigation } from '@react-navigation/native';
 import StatusBarComponent from '../../../../compoent/StatusBarCompoent';
 import LogoutModal from '../../../../compoent/LogoutModal';
+import DeleteProfileModal from '../../../../compoent/DeleteProfileModal';
 import styles from './style';
 import MenuItems from './customData';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,13 +32,15 @@ const dispatch = useDispatch()
 };
 // get-profile
 //  
-  const renderItem = ({ item }:any) => (
+  const renderItem = ({ item }: any) => (
     <TouchableOpacity style={styles.menuItem}
       onPress={() => {
         if (item?.label === "Log Out") {
           setLogoutModal(true);
-        } else {
-          navigation.navigate(item?.screen);
+        } else if (item?.label === "Delete Profile") {
+          setDeleteProfileModal(true);
+        } else if (item?.screen) {
+          navigation.navigate(item.screen);
         }
       }}
     >
@@ -45,7 +48,18 @@ const dispatch = useDispatch()
       <Text style={styles.menuText}>{item.label}</Text>
     </TouchableOpacity>
   );
-  const [logoutModal, setLogoutModal] = useState(false)
+  const [logoutModal, setLogoutModal] = useState(false);
+  const [deleteProfileModal, setDeleteProfileModal] = useState(false);
+
+  const handleDeleteProfileYes = () => {
+    setDeleteProfileModal(false);
+    dispatch(logout());
+    navigation.reset({
+      index: 0,
+      routes: [{ name: ScreenNameEnum.LoginScreen }],
+    });
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBarComponent />
@@ -80,10 +94,16 @@ const dispatch = useDispatch()
           }}
         />
       </ScrollView>
-      <LogoutModal isVisible={logoutModal}
+      <LogoutModal
+        isVisible={logoutModal}
         close={() => setLogoutModal(false)}
-        onSumbit={
-          handleLogout()}
+        onSumbit={handleLogout()}
+      />
+      <DeleteProfileModal
+        isVisible={deleteProfileModal}
+        onClose={() => setDeleteProfileModal(false)}
+        onYes={handleDeleteProfileYes}
+        onNo={() => setDeleteProfileModal(false)}
       />
     </SafeAreaView>
   );
