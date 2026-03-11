@@ -3,6 +3,28 @@ import ScreenNameEnum from "../../routes/screenName.enum";
 import { errorToast, successToast } from "../../utils/customToast";
 import { loginSuccess } from "../feature/authSlice";
 import { getSuccess } from "../feature/authGetSlice";
+
+/**
+ * Safely parse JSON from server. Prevents "Unexpected character: <" when server returns HTML.
+ * Throws a proper Error so Error.stack works correctly.
+ */
+function safeParseJson(text, context = "Response") {
+    const raw = typeof text === "string" ? text.trim() : "";
+    if (!raw) {
+        throw new Error(`${context}: Empty response`);
+    }
+    const first = raw.charAt(0);
+    if (first !== "{" && first !== "[") {
+        throw new Error(`${context}: Server returned non-JSON (check URL and server).`);
+    }
+    try {
+        return JSON.parse(raw);
+    } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        throw new Error(`${context}: Invalid JSON - ${msg}`);
+    }
+}
+
 const LoginUserApi = async (
     param,
     setLoading,
@@ -23,30 +45,31 @@ const LoginUserApi = async (
         const respons = await fetch(`${base_url}${constant.Login}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res)
+                const response = safeParseJson(res, "Login");
+                console.log("response", response);
                 if (response?.status == '1') {
-                    setLoading(false)
-                    successToast(
-                        response?.message
-                    );
-                    param.dispatch(loginSuccess({ userData: response?.result, token: response?.result?.access_token, }));
+                    setLoading(false);
+                    successToast(response?.message);
+                    param.dispatch(loginSuccess({ userData: response?.result, token: response?.result?.access_token }));
                     param.navigation.reset({
                         index: 0,
                         routes: [{ name: ScreenNameEnum.HomeScreen }],
                     });
-                  
-                    return response
+                    return response;
                 } else {
-                    setLoading(false)
-                    errorToast(
-                        response.message,
-                    );
-                    return response
+                    setLoading(false);
+                    errorToast(response?.message || "Login failed");
+                    return response;
                 }
             })
-            .catch((error) =>
-                console.error(error));
-        return respons
+            .catch((error) => {
+                setLoading(false);
+                const message = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(message);
+                console.error("Login error:", message);
+                console.error("error error:", error);
+            });
+        return respons;
     } catch (error) {
         setLoading(false)
         errorToast(
@@ -74,19 +97,21 @@ const SinupUserApi = async (param, setLoading) => {
 
         const response = await fetch(`${base_url}${constant.SignUp}`, requestOptions);
         const res = await response.text();
-        const jsonResponse = JSON.parse(res);
+        const jsonResponse = safeParseJson(res, "SignUp");
+
         setLoading(false);
         if (jsonResponse?.status == "1") {
             successToast(jsonResponse?.message);
             param?.navigation.navigate(ScreenNameEnum.LoginScreen);
             return jsonResponse;
         } else {
-            errorToast(jsonResponse?.message);
+            errorToast(jsonResponse?.message || "Sign up failed");
             return jsonResponse;
         }
     } catch (error) {
         setLoading(false);
-        errorToast("Network error");
+        const message = error instanceof Error ? error.message : "Invalid response from server";
+        errorToast(message);
     }
 };
 
@@ -108,7 +133,7 @@ const ForgotPassUserApi = async (
         const respons = await fetch(`${base_url}${constant.ForgetPassword}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res)
+                const response = safeParseJson(res, "ForgotPassword")
                 if (response?.status == '1') {
                     setLoading(false)
                     successToast(
@@ -132,8 +157,12 @@ const ForgotPassUserApi = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -162,7 +191,7 @@ const OtpUserApi = async (
         const respons = await fetch(`${base_url}${constant.OtpVerify}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res)
+                const response = safeParseJson(res, "ForgotPassword")
                 if (response?.status == '1') {
                     setLoading(false)
                     successToast(
@@ -180,8 +209,12 @@ const OtpUserApi = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -211,7 +244,7 @@ const UpdatePassUserApi = async (
         const respons = await fetch(`${base_url}${constant.UpdatePassword}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res)
+                const response = safeParseJson(res, "ForgotPassword")
                 if (response?.status == '1') {
                     setLoading(false)
                     successToast(
@@ -227,8 +260,12 @@ const UpdatePassUserApi = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -269,7 +306,7 @@ const UpdateProfile_Api = async (param, setLoading) => {
 
         const response = await fetch(`${base_url}${constant.updateProfile}`, requestOptions);
         const responseText = await response.text();
-        const result = JSON.parse(responseText);
+        const result = safeParseJson(responseText, "API");
         
         if (result.status == '1') {
             successToast(result?.message);
@@ -301,7 +338,7 @@ const GetProfile = async (userId, dispatch) => {
         };
         const response = await fetch(`${base_url}${constant.getrofile}`, requestOptions)
         const resText = await response.text(); // Ensure text is received before parsing
-        const responseData = JSON.parse(resText);
+        const responseData = safeParseJson(resText, "API");
         if (responseData.status == '1') {
             console.log("responseData.status",responseData.result)
             dispatch(
@@ -330,7 +367,7 @@ const GetaboutusePolicyApi = async (
         const respons = await fetch(`${base_url}${constant.getAboutUs}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setLoading(false)
                     return response
@@ -342,8 +379,12 @@ const GetaboutusePolicyApi = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -364,7 +405,7 @@ const PrivacyPolicyApi = async (
         const respons = await fetch(`${base_url}${constant.getPrivacy}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setLoading(false)
                     return response
@@ -376,8 +417,12 @@ const PrivacyPolicyApi = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -412,7 +457,7 @@ const AddContactUs = async (
         const respons = await fetch(`${base_url}${constant.AddContact_us}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setLoading(false);
                     successToast(
@@ -428,8 +473,12 @@ const AddContactUs = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -463,7 +512,7 @@ const ChangePasswordApi = async (
         const respons = await fetch(`${base_url}${constant.changePassword}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setLoading(false)
                     successToast(
@@ -479,8 +528,12 @@ const ChangePasswordApi = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -531,7 +584,7 @@ const PlayerPostApi = async (
             .then((response) => response.text())
             .then((res) => {
                 console.log("res", res);
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setLoading(false)
                     successToast(
@@ -548,8 +601,12 @@ const PlayerPostApi = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -601,7 +658,7 @@ const PlayerPostEditApi = async (
         const respons = await fetch(`${base_url}${constant.updatePlayer}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                 const response = JSON.parse(res);
+                 const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setLoading(false)
                     successToast(
@@ -617,8 +674,12 @@ const PlayerPostEditApi = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         console.log("error", error)
@@ -642,7 +703,7 @@ const Teamcategory = async (
         const respons = await fetch(`${base_url}${constant.GettTeam}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setisLoading(false)
 
@@ -654,8 +715,12 @@ const Teamcategory = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         errorToast(
@@ -674,7 +739,7 @@ const PositioncCategory = async (
         const respons = await fetch(`${base_url}${constant.getPosition}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
 
                     return response
@@ -685,8 +750,12 @@ const PositioncCategory = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         errorToast(
@@ -704,7 +773,7 @@ const TrainingCategory = async (
         const respons = await fetch(`${base_url}${constant.getLoadType}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
 
                     return response
@@ -715,8 +784,12 @@ const TrainingCategory = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         errorToast(
@@ -738,7 +811,7 @@ const Getplayer = async (userId, setLoading) => {
         const response = await fetch(`${base_url}${constant.getPlayer}?user_id=${userId}`, requestOptions);
         // const response = await fetch(`${base_url}${constant.getPlayer}?coach_id=${userId}`, requestOptions);
         const resText = await response.text();
-        const responseData = JSON.parse(resText);
+        const responseData = safeParseJson(resText, "API");
         if (responseData.status === '1') {
             successToast(responseData.message);
             return { userGetData: responseData.result };
@@ -766,7 +839,7 @@ const GetNotifications = async (userId, setLoading) => {
         };
         const response = await fetch(`${base_url}${constant.getNotifications}?user_id=${userId}`, requestOptions);
           const resText = await response.text();
-        const responseData = JSON.parse(resText);
+        const responseData = safeParseJson(resText, "API");
          if (responseData.status === '1') {
             successToast(responseData.message);
             return { userGetData: responseData.result };
@@ -805,7 +878,7 @@ const SumitRpfFrom = async (
             .then((response) => response.text())
             .then((res) => {
                 console.log("res", res)
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setLoading(false)
                     successToast(
@@ -822,8 +895,12 @@ const SumitRpfFrom = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -845,7 +922,7 @@ const GetSubmitRPF = async (userId, setLoading) => {
         };
         const response = await fetch(`${base_url}${constant.getSubmit_RPF}?user_id=${userId}`, requestOptions);
         const resText = await response.text();
-        const responseData = JSON.parse(resText);
+        const responseData = safeParseJson(resText, "API");
         if (responseData.status === '1') {
             successToast(responseData.message);
             return { userGetData: responseData.result };
@@ -880,7 +957,7 @@ const GetSubmitRPF = async (userId, setLoading) => {
 
 //         const response = await fetch(`${base_url}${constant.getConversation}`, requestOptions);
 //         const resText = await response.text();
-//         const responseData = JSON.parse(resText);
+//         const responseData = safeParseJson(resText, "API");
 //         console.log("ddddd",responseData)
 //         if (responseData.status === '1') {
 //             successToast(responseData.message);
@@ -917,7 +994,7 @@ const GetAllChatMessage = async (setLoading, userId) => {
         const resText = await response.text();
 
         try {
-            const responseData = JSON.parse(resText);
+            const responseData = safeParseJson(resText, "API");
             console.log("API Response:", responseData);
 
             // ✅ FIXED: Check for both number 1 and string "1"
@@ -961,7 +1038,7 @@ const SendMessage = async (
         const respons = await fetch(`${base_url}${constant.sendChat}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                 const response = JSON.parse(res);
+                 const response = safeParseJson(res, "ForgotPassword");
                 if (response.result.chat_message) {
                     setLoading(false)
                    
@@ -974,8 +1051,12 @@ const SendMessage = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -1006,7 +1087,7 @@ const FeedbackApicall = async (
             .then((response) => response.text())
             .then((res) => {
                 console.log("-ol", res)
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     setLoading(false)
                     successToast(
@@ -1022,8 +1103,12 @@ const FeedbackApicall = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -1053,7 +1138,7 @@ const GetChat = async (
         const respons = await fetch(`${base_url}${constant.getChat}`, requestOptions)
             .then((response) => response.text())
             .then((res) => {
-                const response = JSON.parse(res);
+                const response = safeParseJson(res, "ForgotPassword");
                 if (response.status == '1') {
                     return response
                 } else {
@@ -1063,8 +1148,12 @@ const GetChat = async (
                     return response
                 }
             })
-            .catch((error) =>
-                console.error(error));
+            .catch((error) => {
+                setLoading(false);
+                const msg = error instanceof Error ? error.message : "Invalid response from server";
+                errorToast(msg);
+                console.error(msg);
+            });
         return respons
     } catch (error) {
         setLoading(false)
@@ -1105,7 +1194,7 @@ const GetChat = async (
     );
 
     const responseText = await response.text();
-    const result = JSON.parse(responseText);
+    const result = safeParseJson(responseText, "API");
 
     if (result.status == "1") {
       successToast(result?.message);
@@ -1130,7 +1219,7 @@ const GetChat = async (
     );
 
     const responseText = await response.text();
-    const result = JSON.parse(responseText);
+    const result = safeParseJson(responseText, "API");
     console.log("responseq",response)
 
     if (result.status == "1") {
@@ -1154,7 +1243,7 @@ const GetAllBookingsApi = async (setLoading) => {
     setLoading(true);
     const response = await fetch(`${base_url}get_all_bookings`);
     const responseText = await response.text();
-    const result = JSON.parse(responseText);
+    const result = safeParseJson(responseText, "API");
     if (result.status == "1") {
       return result?.result || result?.data || [];
     }

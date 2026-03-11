@@ -9,8 +9,8 @@ import Toast from 'react-native-toast-message';
 import toastConfig from '../utils/customToast';
 import NetInfo from '@react-native-community/netinfo';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import NetworkStatusModal from '../compoent/NetworkStatusModal';
-
+import UpdateModal from '../checkAppUpdate';
+ 
 const AppNavigator: React.FC = () => {
   const [isConnected, setIsConnected] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,12 +23,15 @@ const AppNavigator: React.FC = () => {
 
     return () => unsubscribe();
   }, []);
+ 
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
           <NavigationContainer>
+              <UpdateModal />
             {/* <NetworkStatusModal 
   isConnected={isConnected}
   modalVisible={showModal}

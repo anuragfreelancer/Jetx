@@ -776,9 +776,9 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    // Search when query updates
+    // Search when query updates (allow 1 character so "D" shows Dubai, DXB, etc.)
     useEffect(() => {
-        if (debouncedQuery.trim().length >= 2) {
+        if (debouncedQuery.trim().length >= 1) {
             searchAirports(debouncedQuery.trim());
         } else {
             setAirports([]);
@@ -791,8 +791,8 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
             
             console.log('🔍 Searching airports from REAL API for:', query);
             
-            // Use REAL Aviapages API for airport search (v3/airports/)
-            const response = await searchAirportsAPI(query);
+            // Use REAL Aviapages API for airport search (v3/airports/) – request more results
+            const response = await searchAirportsAPI(query, { page_size: 200 });
             
             console.log('📥 Airport API Response:', response?.results?.length || response?.length || 0, 'airports found');
             
@@ -814,8 +814,18 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
                     longitude: airport.longitude,
                     timezone: airport.timezone,
                 }));
-                console.log('✅ Formatted', formattedAirports.length, 'airports from API');
-                setAirports(formattedAirports);
+                // Merge with matching popular airports so we show full list (no duplicates by iataCode)
+                const iataSet = new Set(formattedAirports.map((a: any) => (a.iataCode || '').toUpperCase()));
+                const extraFromPopular = popularAirports.filter(
+                    (p) => (query.length >= 1) && (p.iataCode.toLowerCase().includes(query.toLowerCase()) ||
+                        p.city.toLowerCase().includes(query.toLowerCase()) ||
+                        p.displayName.toLowerCase().includes(query.toLowerCase()) ||
+                        p.country.toLowerCase().includes(query.toLowerCase())) &&
+                        !iataSet.has(p.iataCode)
+                );
+                const merged = [...formattedAirports, ...extraFromPopular];
+                console.log('✅ Formatted', formattedAirports.length, 'from API +', extraFromPopular.length, 'popular =', merged.length, 'airports');
+                setAirports(merged);
             } else {
                 useFallbackData(query);
             }
@@ -827,14 +837,16 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
     };
 
     const useFallbackData = (query) => {
-        const filteredAirports = popularAirports.filter(airport => 
-            airport.city.toLowerCase().includes(query.toLowerCase()) ||
-            airport.iataCode.toLowerCase().includes(query.toLowerCase()) ||
-            airport.icaoCode.toLowerCase().includes(query.toLowerCase()) ||
-            airport.displayName.toLowerCase().includes(query.toLowerCase()) ||
-            airport.country.toLowerCase().includes(query.toLowerCase())
-        );
-        
+        const q = (query || '').toLowerCase().trim();
+        const filteredAirports = q.length >= 1
+            ? popularAirports.filter(airport =>
+                airport.city.toLowerCase().includes(q) ||
+                airport.iataCode.toLowerCase().includes(q) ||
+                airport.icaoCode.toLowerCase().includes(q) ||
+                airport.displayName.toLowerCase().includes(q) ||
+                airport.country.toLowerCase().includes(q)
+            )
+            : [...popularAirports];
         console.log("📋 Fallback results:", filteredAirports.length);
         setAirports(filteredAirports);
     };
@@ -883,14 +895,17 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
         </TouchableOpacity>
     );
 
-    // Determine which data to show
-    const displayData = airports.length > 0 ? airports : 
-        (searchQuery.length >= 2 ? 
-            popularAirports.filter(airport => 
+    // Determine which data to show: when no query show all popular; when typing show API + fallback
+    const displayData = airports.length > 0
+        ? airports
+        : (searchQuery.length >= 1
+            ? popularAirports.filter(airport =>
                 airport.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 airport.iataCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                airport.displayName.toLowerCase().includes(searchQuery.toLowerCase())
-            ) : []);
+                airport.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                airport.country.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            : popularAirports);
 
     return (
         <Modal
@@ -933,23 +948,23 @@ const AirportSearchModal = ({ visible, onClose, onSelectAirport }:any) => {
                                 <ActivityIndicator size="large" color="#007AFF" />
                                 <Text style={styles.loadingText}>Searching airports...</Text>
                             </View>
-                        ) : searchQuery.length >= 2 ? (
+                        ) : searchQuery.length >= 1 ? (
                             <View style={styles.centerContainer}>
                                 <Text style={styles.noResults}>No airports found</Text>
                                 <Text style={styles.suggestion}>
-                                    Try searching with airport codes (JFK, DXB, DEL) or major city names
+                                    Try airport codes (JFK, DXB, DEL) or city names
                                 </Text>
                             </View>
                         ) : (
                             <View style={styles.centerContainer}>
                                 <Text style={styles.placeholder}>
-                                    Type at least 2 letters{'\n'}
+                                    Type 1 or more letters{'\n'}
                                     Examples: "JFK", "New York", "DXB", "Dubai"
                                 </Text>
                                 <View style={styles.popularSection}>
                                     <Text style={styles.popularTitle}>Popular Airports:</Text>
                                     <View style={styles.popularList}>
-                                        {popularAirports.slice(0, 6).map(airport => (
+                                        {popularAirports.map(airport => (
                                             <TouchableOpacity 
                                                 key={airport.id}
                                                 style={styles.popularItem}

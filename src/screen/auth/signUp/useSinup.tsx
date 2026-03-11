@@ -98,6 +98,7 @@ const useSignup = () => {
       };
        
      const response = await SinupUserApi(params, setIsLoading);
+     console.log("response",response)
     } catch (error) {
       console.error("Signup Error:", error);
     }

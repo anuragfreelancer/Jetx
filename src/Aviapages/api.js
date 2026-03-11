@@ -97,13 +97,14 @@ export const getCharterAircraftById = async (aircraftId) => {
 /**
  * Search airports
  * @param {string} query - Search query (city, ICAO, IATA)
+ * @param {object} options - Optional: { page_size } to get more results
  * @returns {Promise} Airport list
  */
-export const searchAirports = async (query) => {
+export const searchAirports = async (query, options = {}) => {
   try {
-    const response = await api.get('/airports/', {
-      params: { search: query }
-    });
+    const params = { search: query };
+    if (options.page_size != null) params.page_size = options.page_size;
+    const response = await api.get('/airports/', { params });
     return response.data;
   } catch (error) {
     handleApiError(error, 'Failed to search airports');

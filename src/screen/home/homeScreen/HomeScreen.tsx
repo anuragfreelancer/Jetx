@@ -925,10 +925,21 @@ const HomeScreen = () => {
     }));
   };
 
-  // Format date for display
+  // Format date for display (timezone-safe: parse YYYY-MM-DD as local so all devices show same day)
   const formatDisplayDate = (dateString: string) => {
     if (!dateString) return 'Select date';
+    const str = String(dateString).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      const [y, m, d] = str.split('-').map(Number);
+      const date = new Date(y, m - 1, d);
+      return date.toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Select date';
     return date.toLocaleDateString('en-US', {
       day: 'numeric',
       month: 'short',
@@ -936,15 +947,38 @@ const HomeScreen = () => {
     });
   };
 
-  // Format date for API (YYYY-MM-DD)
+  // Format date for API (YYYY-MM-DD) – use local date so stored date matches user selection on all devices
   const formatDateForAPI = (date: Date) => {
-    return date.toISOString().split('T')[0];
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   };
 
-  // Format date and time for display
+  // Parse YYYY-MM-DD as local date (avoids wrong day on some devices/timezones)
+  const parseLocalDate = (dateString: string): Date | null => {
+    if (!dateString) return null;
+    const str = String(dateString).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+    const d = new Date(dateString);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
+  // Format date and time for display (timezone-safe for date part)
   const formatDateTimeDisplay = (date: string, time: string) => {
     if (!date) return 'Select date & time';
-    const dateObj = new Date(date);
+    const str = String(date).trim();
+    let dateObj: Date;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      const [y, m, d] = str.split('-').map(Number);
+      dateObj = new Date(y, m - 1, d);
+    } else {
+      dateObj = new Date(date);
+    }
+    if (isNaN(dateObj.getTime())) return 'Select date & time';
     const formattedDate = dateObj.toLocaleDateString('en-US', {
       day: 'numeric',
       month: 'short'
@@ -970,9 +1004,9 @@ const HomeScreen = () => {
   // Validate dates and times
   const validateDates = (departureDate: string, returnDate: string, departureTime: string, returnTime: string) => {
     if (tripType === 'round-trip' && departureDate && returnDate) {
-      const depDate = new Date(departureDate);
-      const retDate = new Date(returnDate);
-      
+      const depDate = parseLocalDate(departureDate);
+      const retDate = parseLocalDate(returnDate);
+      if (!depDate || !retDate) return true;
       // If same date, check times
       if (depDate.getTime() === retDate.getTime()) {
         const [depHour, depMinute] = departureTime.split(':').map(Number);
@@ -986,7 +1020,7 @@ const HomeScreen = () => {
           );
           return false;
         }
-      } else if (retDate <= depDate) {
+      } else if (retDate.getTime() <= depDate.getTime()) {
         Alert.alert(
           'Invalid Date',
           'Return date must be after departure date',
@@ -1045,8 +1079,8 @@ const HomeScreen = () => {
 
   // Get minimum date for return date picker
   const getMinReturnDate = () => {
-    if (searchParams.departureDate) {
-      const depDate = new Date(searchParams.departureDate);
+    const depDate = searchParams.departureDate ? parseLocalDate(searchParams.departureDate) : null;
+    if (depDate) {
       const minDate = new Date(depDate);
       minDate.setDate(depDate.getDate() + 1);
       return minDate;
@@ -1057,17 +1091,19 @@ const HomeScreen = () => {
   // Get current date for date picker
   const getCurrentDate = (type: string) => {
     if (type === 'departure' && searchParams.departureDate) {
-      return new Date(searchParams.departureDate);
+      return parseLocalDate(searchParams.departureDate) ?? new Date();
     }
     if (type === 'return' && searchParams.returnDate) {
-      return new Date(searchParams.returnDate);
+      return parseLocalDate(searchParams.returnDate) ?? new Date();
     }
 
     if (type === 'return' && searchParams.departureDate) {
-      const depDate = new Date(searchParams.departureDate);
-      const nextDay = new Date(depDate);
-      nextDay.setDate(depDate.getDate() + 1);
-      return nextDay;
+      const depDate = parseLocalDate(searchParams.departureDate);
+      if (depDate) {
+        const nextDay = new Date(depDate);
+        nextDay.setDate(depDate.getDate() + 1);
+        return nextDay;
+      }
     }
 
     return new Date();
@@ -1196,10 +1232,9 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (searchParams.departureDate && searchParams.returnDate) {
-      const depDate = new Date(searchParams.departureDate);
-      const retDate = new Date(searchParams.returnDate);
-
-      if (retDate <= depDate) {
+      const depDate = parseLocalDate(searchParams.departureDate);
+      const retDate = parseLocalDate(searchParams.returnDate);
+      if (depDate && retDate && retDate.getTime() <= depDate.getTime()) {
         setSearchParams(prev => ({
           ...prev,
           returnDate: ''
@@ -1536,7 +1571,7 @@ const HomeScreen = () => {
                 </View>
               )}
 
-              <View style={styles.passengerContainer}>
+              {/* <View style={styles.passengerContainer}>
                 <Text style={styles.inputLabel}>Passengers</Text>
                 <View style={styles.passengerSelector}>
                   <View style={styles.passengerItem}>
@@ -1551,7 +1586,7 @@ const HomeScreen = () => {
                     <Text style={styles.editText}>Edit</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </View> */}
 
               <PassengerModal
                 visible={isPassengerModalVisible}
