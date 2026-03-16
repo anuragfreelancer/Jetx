@@ -1197,7 +1197,7 @@ const GetChat = async (
     const result = safeParseJson(responseText, "API");
 
     if (result.status == "1") {
-      successToast(result?.message);
+      successToast("Flight requested successfully!");
       return result;
     } else {
       errorToast(result?.message || result?.error);

@@ -12,7 +12,7 @@ import {
 import imageIndex from '../../assets/imageIndex';
 
 const { width } = Dimensions.get('window');
-const THEME_COLOR = 'red';
+const THEME_COLOR = 'black';
 
 const LoadingModal = ({ visible, message = "Loading..." }) => {
   const spinValue = useRef(new Animated.Value(0)).current;

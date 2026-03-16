@@ -58,7 +58,7 @@ export default function SignUp() {
           </View>
           <View style={{ marginTop: 22, alignItems: "center" }}>
             <Text style={styles.txtHeading}>
-              Welcome Back to <Text style={{ color: '#FF3B30' }}>Brayh</Text>
+              Welcome Back to <Text style={{ color: 'black' }}>Brayh</Text>
             </Text>
 
           </View>
@@ -110,7 +110,7 @@ export default function SignUp() {
         </View>
 
      
-        {/* <Text style={{ marginTop: 40, fontSize: 16, lineHeight: 22, color: 'black', textAlign: "center", fontWeight: "500" }}>
+        {/* <Text style={{ marginTop: 40, fontSize: 16, lineHeight: 22, color: '#FF3B30', textAlign: "center", fontWeight: "500" }}>
           OR
         </Text>
         <View style={{ alignItems: 'center', marginTop:20}}>
@@ -153,7 +153,7 @@ const Styles = StyleSheet.create({
   },
   btn: {
     alignSelf: 'center',
-    backgroundColor: '#E8442E',
+    backgroundColor: 'black',
     height: 55,
 
     borderRadius: 30,

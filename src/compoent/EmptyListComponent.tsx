@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 15,
-        color: 'black',
+        color: '#FF3B30',
         fontWeight:"500",
         
     },

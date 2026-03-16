@@ -217,7 +217,7 @@ const CharterDetailsScreen = () => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#DC2626" />
+        <ActivityIndicator size="large" color="black" />
         <Text style={styles.loadingTitle}>Loading Charter Details</Text>
         <Text style={styles.loadingSub}>Preparing your luxury experience</Text>
       </View>
@@ -227,7 +227,7 @@ const CharterDetailsScreen = () => {
   if (!charterDetails) {
     return (
       <View style={styles.center}>
-        <Icon name="error" size={56} color="#DC2626" />
+        <Icon name="error" size={56} color="black" />
         <Text style={styles.errorTitle}>Unable to load charter details</Text>
 
         <TouchableOpacity style={styles.primaryBtn} onPress={loadCharterDetails} activeOpacity={0.8}>
@@ -360,7 +360,7 @@ const CharterDetailsScreen = () => {
                     disabled={selectedSeats <= 1}
                     activeOpacity={0.85}
                   >
-                    <Icon name="remove" size={22} color={selectedSeats <= 1 ? '#CBD5E1' : '#DC2626'} />
+                    <Icon name="remove" size={22} color={selectedSeats <= 1 ? '#CBD5E1' : 'black'} />
                   </TouchableOpacity>
 
                   <View style={styles.stepMid}>
@@ -374,7 +374,7 @@ const CharterDetailsScreen = () => {
                     disabled={selectedSeats >= maxSeats}
                     activeOpacity={0.85}
                   >
-                    <Icon name="add" size={22} color={selectedSeats >= maxSeats ? '#CBD5E1' : '#DC2626'} />
+                    <Icon name="add" size={22} color={selectedSeats >= maxSeats ? '#CBD5E1' : 'black'} />
                   </TouchableOpacity>
                 </View>
 
@@ -428,7 +428,7 @@ const CharterDetailsScreen = () => {
 
               {/* Info */}
               <View style={styles.infoCard}>
-                <Icon name="info" size={20} color="#DC2626" style={{ marginRight: 10, marginTop: 1 }} />
+                <Icon name="info" size={20} color="black" style={{ marginRight: 10, marginTop: 1 }} />
                 <Text style={styles.infoText}>
                   You are booking the entire aircraft. All amenities, catering, and ground transportation included.
                   Price includes {SERVICE_FEE_PERCENTAGE}% service fee. For custom requests, contact our concierge after booking.
@@ -467,9 +467,9 @@ const styles = StyleSheet.create({
   loadingTitle: { marginTop: 14, fontSize: 16, fontWeight: '700', color: '#0F172A' },
   loadingSub: { marginTop: 6, fontSize: 13, color: '#64748B' },
 
-  errorTitle: { marginTop: 12, fontSize: 16, fontWeight: '700', color: '#DC2626', textAlign: 'center' },
+  errorTitle: { marginTop: 12, fontSize: 16, fontWeight: '700', color: 'black', textAlign: 'center' },
 
-  primaryBtn: { marginTop: 16, backgroundColor: '#DC2626', paddingVertical: 12, paddingHorizontal: 28, borderRadius: 12 },
+  primaryBtn: { marginTop: 16, backgroundColor: 'black', paddingVertical: 12, paddingHorizontal: 28, borderRadius: 12 },
   primaryBtnText: { color: '#FFF', fontWeight: '700' },
 
   secondaryBtn: { marginTop: 10, backgroundColor: '#E2E8F0', paddingVertical: 12, paddingHorizontal: 28, borderRadius: 12 },
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(220,38,38,0.85)',
+    backgroundColor: 'black',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  thumbWrapActive: { borderColor: '#DC2626' },
+  thumbWrapActive: { borderColor: 'black' },
   thumbImg: { width: '100%', height: '100%' },
 
   content: {
@@ -599,14 +599,14 @@ const styles = StyleSheet.create({
   },
   stepBtnDisabled: { backgroundColor: '#F1F5F9' },
   stepMid: { alignItems: 'center' },
-  stepNum: { fontSize: 26,   color: '#DC2626' },
+  stepNum: { fontSize: 26,   color: 'black' },
   stepLabel: { fontSize: 12,  color: '#64748B', marginTop: 2 },
   successText: { marginTop: 10, textAlign: 'center', color: '#10B981', fontWeight: '800' },
 
   priceHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   priceTitle: { fontSize: 16,   color: '#0F172A' },
   priceSub: { marginTop: 4, fontSize: 12, color: '#64748B', fontWeight: '700' },
-  priceTotal: { fontSize: 20,   color: '#DC2626' },
+  priceTotal: { fontSize: 20,   color: 'black' },
   priceCurrency: { marginTop: 2, fontSize: 12, color: '#64748B', fontWeight: '700' },
 
   row: { marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
   line: { height: 1, backgroundColor: '#E2E8F0', marginTop: 14 },
 
   totalLabel: { fontSize: 15, fontWeight: '900', color: '#0F172A' },
-  totalValue: { fontSize: 18, fontWeight: '900', color: '#DC2626' },
+  totalValue: { fontSize: 18, fontWeight: '900', color: 'black' },
 
   notePill: {
     marginTop: 14,
@@ -653,14 +653,14 @@ const styles = StyleSheet.create({
     borderTopColor: '#E2E8F0',
   },
   bookBtn: {
-    backgroundColor: '#DC2626',
+    backgroundColor: 'black',
     borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    shadowColor: '#DC2626',
+    shadowColor: 'black',
     shadowOpacity: 0.25,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 8 },

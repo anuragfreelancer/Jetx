@@ -8,7 +8,7 @@ const Styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '700',
-    color: 'black',
+    color: '#FF3B30',
     bottom: 2,
   },
   btn: {

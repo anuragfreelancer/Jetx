@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   yesButton: {
-    backgroundColor: "#FF3B30",
+    backgroundColor: "black",
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 15,

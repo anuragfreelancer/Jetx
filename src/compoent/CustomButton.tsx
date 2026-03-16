@@ -41,7 +41,7 @@ const CustomButton: React.FC<CustomButtonProps> = React.memo(({
 // Default styles
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: 'black',
     paddingVertical: 12,
     paddingHorizontal: 20,
     height: 58,

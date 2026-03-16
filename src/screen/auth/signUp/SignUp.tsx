@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   title: {
     color: 'black',
     fontSize: 24,
-    fontWeight: '900',
+    fontWeight: '600',
   },
   formContainer: {
     marginTop: ResponsiveSize.marginTop(25),
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 16,
-    color: 'black',
+    color: '#FF3B30',
   },
   errorText: {
     color: 'red',
@@ -279,6 +279,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '700',
-    color: 'black',
+    color: '#FF3B30',
   },
 });

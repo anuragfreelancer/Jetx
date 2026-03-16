@@ -572,10 +572,10 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   inputError: {
-    borderColor: '#ff3b30',
+    borderColor: '#FF3B30',
   },
   errorText: {
-    color: '#ff3b30',
+    color: '#FF3B30',
     fontSize: 12,
     marginTop: 4,
   },

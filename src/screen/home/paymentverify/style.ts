@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
       marginBottom: 20,
   },
   title: {
-      color: 'black',
+      color: '#FF3B30',
       fontWeight: '700',
       fontSize: 20,
       textAlign: 'center',

@@ -222,8 +222,8 @@ const ProfileEdit = () => {
           {/* Form Fields */}
           <View style={{ marginHorizontal: 15, marginTop: 30, width: '92%' }}>
             <TextInputField
-              imgStyle={{ tintColor: "#FF3B30" }}
-              placeholderTextColor={"#FF3B30"}
+              imgStyle={{ tintColor: "black" }}
+              placeholderTextColor={"black"}
               placeholder={'Full Name'}
               text={formData.name}
               onChangeText={(text) => handleInputChange('name', text)}
@@ -234,8 +234,8 @@ const ProfileEdit = () => {
            
             
             <TextInputField
-              imgStyle={{ tintColor: "#FF3B30" }}
-              placeholderTextColor={"#FF3B30"}
+              imgStyle={{ tintColor: "black" }}
+              placeholderTextColor={"black"}
               placeholder={'Phone'}
               text={formData.phone}
               onChangeText={(text) => handleInputChange('phone', text)}
@@ -244,8 +244,8 @@ const ProfileEdit = () => {
             />
             
             <TextInputField
-              imgStyle={{ tintColor: "#FF3B30" }}
-              placeholderTextColor={"#FF3B30"}
+              imgStyle={{ tintColor: "black" }}
+              placeholderTextColor={"black"}
               placeholder={'Country'}
               text={formData.country}
               onChangeText={(text) => handleInputChange('country', text)}
@@ -254,8 +254,8 @@ const ProfileEdit = () => {
             />
 
             <TextInputField
-              imgStyle={{ tintColor: "#FF3B30" }}
-              placeholderTextColor={"#FF3B30"}
+              imgStyle={{ tintColor: "black" }}
+              placeholderTextColor={"black"}
               placeholder={'City'}
               text={formData.city}
               onChangeText={(text) => handleInputChange('city', text)}
@@ -270,7 +270,11 @@ const ProfileEdit = () => {
           title={'Update Profile'}
           onPress={handleUpdateProfile}
           disabled={loading}
-        />
+         buttonStyle={[
+                {
+                  backgroundColor:"black"
+                }
+                ]}       />
       </View>
     </SafeAreaView>
   );
@@ -289,14 +293,14 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    borderWidth: 3,
-    borderColor: '#FF3B30',
+    borderWidth: 1,
+    borderColor: 'gray',
   },
   editIconContainer: {
     position: 'absolute',
     bottom: 5,
     right: 5,
-    backgroundColor: '#FF3B30',
+    backgroundColor: 'gray',
     borderRadius: 15,
     width: 30,
     height: 30,
@@ -310,7 +314,7 @@ const styles = StyleSheet.create({
   },
   changePhotoText: {
     marginTop: 10,
-    color: '#FF3B30',
+    color: 'black',
     fontSize: 14,
     fontWeight: '500',
   },

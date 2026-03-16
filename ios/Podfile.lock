@@ -1639,6 +1639,27 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNCPicker (2.11.4):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNDateTimePicker (8.5.0):
     - DoubleConversion
     - glog
@@ -1974,6 +1995,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
+  - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
@@ -2132,6 +2154,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-masked-view/masked-view"
+  RNCPicker:
+    :path: "../node_modules/@react-native-picker/picker"
   RNDateTimePicker:
     :path: "../node_modules/@react-native-community/datetimepicker"
   RNGestureHandler:
@@ -2221,6 +2245,7 @@ SPEC CHECKSUMS:
   ReactCommon: 865ebe76504a95e115b6229dd00a31e56d2d4bfe
   RNCAsyncStorage: 62fdbd7e63312228d4868779026248c2677911e1
   RNCMaskedView: 308c763227e237d4d260bd8841870e099572bb3e
+  RNCPicker: 477e5fe0132df530d943adf69bfa223770d3a085
   RNDateTimePicker: 66028060ebc0c6d67863fb6e6e670112ba213984
   RNGestureHandler: dcb1b1db024f3744b03af56d132f4f72c4c27195
   RNImageCropPicker: b0afedeefd8655254a15c34103718455fde6ce59

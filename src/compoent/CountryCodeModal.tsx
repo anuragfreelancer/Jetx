@@ -28,14 +28,14 @@ const CountryCodeModal = ({ visible, onSelect, onClose }:any) => {
             style={styles.searchInput}
             placeholder="Search country or code"
             value={searchText}
-            placeholderTextColor={"black"}
+            placeholderTextColor={"#FF3B30"}
             onChangeText={setSearchText}
           />
           {/* Country List */}
           <FlatList
             data={filteredCountries}
             ListEmptyComponent={<EmptyListComponent message="No items Found"
-              textStyle={{ color: "black" }}
+              textStyle={{ color: "#FF3B30" }}
             />}  
             renderItem={({ item }) => (
               <TouchableOpacity style={styles.codeItem} onPress={() => onSelect(item)}>
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 10,
-    color:"black"
+    color:"#FF3B30"
   },
   codeList: {
     maxHeight: 300,

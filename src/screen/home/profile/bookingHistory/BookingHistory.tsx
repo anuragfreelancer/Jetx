@@ -115,7 +115,7 @@ const MyBookingsScreen = ({
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <CustomHeader label="My Bookings" imageSource={imageIndex.backorange} />
+      <CustomHeader label="Bookings" imageSource={imageIndex.backorange} />
 
       {loading ? (
         <View style={styles.loadingWrap}>

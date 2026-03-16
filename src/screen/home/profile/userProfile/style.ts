@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     name: {
       fontSize: 21,
       fontWeight: '600',
-      color:"black",
+      color:"#FF3B30",
       marginTop:10
     },
     editText: {

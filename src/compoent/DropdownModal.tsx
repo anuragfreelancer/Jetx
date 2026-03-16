@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
-     color: "black",
+     color: "#FF3B30",
    },
   option: {
     paddingVertical: 10,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 14,
-    color: "black",
+    color: "#FF3B30",
     fontWeight: "500",
     textTransform: "uppercase",
   },

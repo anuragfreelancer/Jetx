@@ -85,7 +85,7 @@ export default function PasswordReset() {
                 <Text style={{
                   fontSize: 16,
                   fontWeight: '700',
-                  color: 'black',
+                  color: '#FF3B30',
                   marginLeft: 10
                 }}>Email</Text>
                 <TextInput
@@ -95,7 +95,7 @@ export default function PasswordReset() {
                   style={{
                     fontSize: 14,
                     fontWeight: '600',
-                    color: 'black',
+                    color: '#FF3B30',
                     marginLeft: 10 ,
                     marginTop:5
 

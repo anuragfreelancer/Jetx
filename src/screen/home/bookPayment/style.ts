@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
   selectedCard: { borderColor: "blue", borderWidth: 2 },
   addNewCard: { flexDirection: "row", alignItems: "center", marginTop: 15, marginBottom: 10 },
   input: { backgroundColor: "#fff", borderRadius: 10, marginBottom: 10, marginTop: 15 },
-  submitButton: { backgroundColor: "black", borderRadius: 10, alignItems: "center" },
+  submitButton: { backgroundColor: "#FF3B30", borderRadius: 10, alignItems: "center" },
   submitText: { color: "white", fontWeight: "bold" },
   container: {
     backgroundColor: "white",
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 15
   },
   cardName: {
-    color: "black",
+    color: "#FF3B30",
     fontWeight: "600",
     marginLeft: 8
   },

@@ -9,7 +9,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: "#FF3B30",
+    backgroundColor: "black",
+    // backgroundColor: "#FF3B30",
     justifyContent: 'flex-end',
     paddingHorizontal: 24,
     paddingBottom: 20,
@@ -163,9 +164,8 @@ timeSlot: {
   borderColor: '#e0e0e0',
 },
 selectedTimeSlot: {
-  backgroundColor: '#FF3B30',
-  borderColor: '#FF3B30',
-},
+  backgroundColor: 'black',
+ },
 timeSlotText: {
   fontSize: 14,
   fontWeight: '500',
@@ -194,7 +194,7 @@ cancelButton: {
   backgroundColor: '#f5f5f5',
 },
 confirmButton: {
-  backgroundColor: '#FF3B30',
+  backgroundColor: 'black',
 },
 cancelButtonText: {
   color: '#666',
@@ -224,7 +224,7 @@ dateTimeButton: {
   alignItems: 'center',
   backgroundColor: 'white',
   borderWidth: 1,
-  borderColor: '#f27171ff',
+  borderColor: 'black',
   borderRadius: 10,
   paddingVertical: 12,
   paddingHorizontal: 15,
@@ -256,11 +256,10 @@ datePickerContainer: {
 // Flight Card Time Badge
 preferredTimeBadge: {
   fontSize: 10,
-  color: '#FF3B30',
+  color: 'black',
   fontWeight: '600',
   marginTop: 2,
-  backgroundColor: 'rgba(255, 59, 48, 0.1)',
-    borderRadius: 4,
+     borderRadius: 4,
   alignSelf: 'flex-start',
   padding:2, 
   marginBottom:5
@@ -279,9 +278,10 @@ flightTimeInfo: {
     borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
+ 
   },
   tripTypeButtonActive: {
-    backgroundColor: 'red',
+    backgroundColor: 'black',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -458,14 +458,14 @@ flightTimeInfo: {
   editText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF3B30',
+    color: '#black',
   },
   searchButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: 'black',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#FF3B30',
+    shadowColor: 'black',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -522,15 +522,14 @@ flightTimeInfo: {
     position: 'relative',
   },
   featuredFlightCard: {
-    borderColor: '#FF3B30',
+    borderColor: 'black',
     borderWidth: 1.5,
-    backgroundColor: '#fffafa',
-  },
+   },
   featuredBadge: {
     position: 'absolute',
     top: -6,
     left: 16,
-    backgroundColor: '#FF3B30',
+    backgroundColor: 'black',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
@@ -567,7 +566,7 @@ flightTimeInfo: {
   priceText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FF3B30',
+    color: 'black',
   },
   flightRoute: {
     flexDirection: 'row',
@@ -609,7 +608,7 @@ flightTimeInfo: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#FF3B30',
+    backgroundColor: 'black',
   },
   flightLine: {
     flex: 1,
@@ -629,7 +628,7 @@ flightTimeInfo: {
   },
   selectText: {
     fontSize: 14,
-    color: '#FF3B30',
+    color: 'black',
     fontWeight: '600',
   },
   viewMoreButton: {

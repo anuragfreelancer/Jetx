@@ -76,6 +76,7 @@ export default {
   radioSlied: require('./images/radioSlied.png'),
   addUser: require('./images/addUser.png'),
   seped: require('./images/seped.png'),
+  clockBlack: require('./images/clockBlack.png'),
   time: require('./images/time.png'),
   graySolar: require('./images/graySolar.png'),
   filtie: require('./images/filtie.png'),

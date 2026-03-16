@@ -22,7 +22,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <Text style={{
                 fontSize: 25,
                 fontWeight: "700",
-                color: "black",
+                color: "#FF3B30",
                 textAlign: "center",
             }}>Ready to Start?</Text>
             <Text style={styles.description}>
@@ -33,7 +33,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBarComponent backgroundColor='black' barStyle='default' />
+            <StatusBarComponent backgroundColor='#FF3B30' barStyle='default' />
 
             <FlatList
                 data={slides}

@@ -13,7 +13,7 @@ export const color = {
     borderPrimary:'#081041',
     white:'#fff',
     grey:'rgba(173, 164, 165, 1)',
-    black:'#000000'
+    #FF3B30:'#000000'
 
 }
 

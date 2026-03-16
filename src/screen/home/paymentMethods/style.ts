@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   addCardText: {
       fontSize: 17,
       fontWeight: '600',
-      color: "black"
+      color: "#FF3B30"
   },
   continueButton: {
       padding: 15,

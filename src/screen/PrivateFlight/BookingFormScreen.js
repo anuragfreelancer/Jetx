@@ -150,9 +150,10 @@ const FlightBookingScreen = ({ route, navigation }) => {
         console.log("📝 response Payload =>", response);
 
     if (response?.status == "1") {
-      Alert.alert("Success", "Flight booked successfully!", [
-        { text: "OK", onPress: () => navigation.goBack() }
-      ]);
+      navigation.goBack() 
+      // Alert.alert("Success", "Flight booked successfully!", [
+      //   { text: "OK", onPress: () => navigation.goBack() }
+      // ]);
     }
   };
 
@@ -422,13 +423,13 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#FF3B30",
+    backgroundColor: "black",
     height: 52,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 16,
-    shadowColor: "#FF3B30",
+    shadowColor: "black",
     shadowOpacity: 0.3,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
@@ -469,7 +470,7 @@ const styles = StyleSheet.create({
   summaryTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#FF3B30",
+    color: "black",
     marginBottom: 14,
   },
 
@@ -516,6 +517,6 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#FF3B30",
+    color: "black",
   },
 });

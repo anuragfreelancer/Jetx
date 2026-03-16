@@ -269,7 +269,7 @@
 //   durationText: {
 //     fontSize: 14,
 //     fontWeight: '700',
-//     color: 'black',
+//     color: '#FF3B30',
 //   },
 //   airlineContainer: {
 //     flexDirection: 'row',
@@ -305,7 +305,7 @@
 //   airportCode: {
 //     fontSize: 20,
 //     fontWeight: '500',
-//     color: 'black',
+//     color: '#FF3B30',
 //     marginBottom: 2,
 //   },
 //   terminalText: {
@@ -826,7 +826,7 @@ const styles = StyleSheet.create({
   durationText: {
     fontSize: 14,
     fontWeight: '700',
-    color: 'black',
+    color: '#FF3B30',
   },
   airlineContainer: {
     flexDirection: 'row',
@@ -862,7 +862,7 @@ const styles = StyleSheet.create({
   airportCode: {
     fontSize: 20,
     fontWeight: '500',
-    color: 'black',
+    color: '#FF3B30',
     marginBottom: 2,
   },
   terminalText: {
