@@ -2082,8 +2082,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
  import AirportSearchModal from "../../../compoent/AirportSearchModal";
 import CustomDropdown from "../../../compoent/CustomDropdown";
 
-const CALC_URL = "https://api.aviapages.com/v3/flight_calculator/";
-const AIRCRAFT_URL = "https://api.aviapages.com/v3/aircraft/";
+  const CALC_URL = "https://api.aviapages.com/v3/flight_calculator/";
+  const AIRCRAFT_URL = "https://api.aviapages.com/v3/aircraft/";
 const headers = {
   "Content-Type": "application/json",
   Authorization: "Token zgkRrapzpZv3xA811rWtckMIjY6WCkmCpcmn",
