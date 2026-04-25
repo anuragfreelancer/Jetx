@@ -58,7 +58,7 @@ function extractRealPrice(response) {
     if (response[field] && Number(response[field]) > 0) {
       return {
         amount: Number(response[field]),
-        currency: response.currency || response.price_currency || 'USD',
+        currency: "SS",
         source: field,
         breakdown: response.price_breakdown || response.breakdown || null,
       };

@@ -19,7 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
   useEffect(() => {
     const timer = setTimeout(() => {
       checkLogout();
-      getAmadeusToken()
+      // getAmadeusToken()
       verifyApiToken()
     }, 2000);  
     return () => clearTimeout(timer);  
